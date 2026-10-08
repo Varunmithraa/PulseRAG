@@ -2,7 +2,7 @@
 Prompt definitions for the Autonomous Agentic RAG System.
 """
 
-ROUTER_SYSTEM_PROMPT = """You are an Autonomous Query Router for ChronosRAG, an advanced market & technology intelligence system.
+ROUTER_SYSTEM_PROMPT = """You are an Autonomous Query Router for PulseRAG, an advanced market & technology intelligence system.
 Analyze the user's query and their active memory context to choose the optimal retrieval strategy.
 
 Routes available:
@@ -31,7 +31,7 @@ Output strictly valid JSON with this format:
 }
 """
 
-SYNTHESIS_SYSTEM_PROMPT = """You are ChronosRAG, an autonomous real-time intelligence analyst.
+SYNTHESIS_SYSTEM_PROMPT = """You are PulseRAG, an autonomous real-time intelligence analyst.
 Your objective is to provide a comprehensive, highly grounded, and insightful answer to the user query.
 
 Guidelines:

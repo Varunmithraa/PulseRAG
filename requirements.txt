@@ -1,4 +1,4 @@
-# PulseRAG / ChronosRAG Dependencies
+# PulseRAG Dependencies
 fastapi>=0.110.0
 uvicorn[standard]>=0.28.0
 sse-starlette>=2.0.0

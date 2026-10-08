@@ -13,6 +13,7 @@ __pycache__/
 .env
 
 # Database & Vector Storage
+data/pulserag_memory.db
 data/chronos_memory.db
 data/chroma_db/
 data/*.db

@@ -1,4 +1,4 @@
-# ⚡ ChronosRAG: Autonomous Agentic RAG Platform
+# ⚡ PulseRAG: Autonomous Agentic RAG Platform
 
 > **Real-Time Temporal Stream Ingestion & Dual-Tier Cognitive Memory**  
 > Built with **LangGraph**, **FastAPI**, **Google GenAI SDK (Gemini)**, **ChromaDB**, and **SQLite**.
@@ -7,9 +7,9 @@
 
 ## 🌟 Overview
 
-**ChronosRAG** is an enterprise-grade Agentic Retrieval-Augmented Generation (RAG) platform designed for high-velocity intelligence environments (such as financial markets and real-time technology ecosystems).
+**PulseRAG** is an enterprise-grade Agentic Retrieval-Augmented Generation (RAG) platform designed for high-velocity intelligence environments (such as financial markets and real-time technology ecosystems).
 
-Traditional RAG systems fail when dealing with real-time events because static vector indexes have no concept of time, retrieve blindly without relevance verification, and suffer from session amnesia. ChronosRAG solves all three issues:
+Traditional RAG systems fail when dealing with real-time events because static vector indexes have no concept of time, retrieve blindly without relevance verification, and suffer from session amnesia. PulseRAG solves all three issues:
 
 1. **Temporal Live-Stream Ingestion**: Background workers continuously ingest RSS, breaking news, and market events into an in-memory sliding buffer with **mathematical recency-decay scoring** ($Score = \alpha \cdot \text{Similarity} + (1-\alpha) \cdot e^{-\lambda \Delta t}$).
 2. **Corrective RAG (CRAG) & Autonomous Routing**: An autonomous LangGraph state machine evaluates query intent, retrieves candidate chunks, grades chunk relevance, and prunes noisy or hallucinated snippets before synthesis.
@@ -113,7 +113,7 @@ Open **`http://127.0.0.1:8000`** in your browser.
 
 You can feature this project on your resume as follows:
 
-> **ChronosRAG — Autonomous Agentic RAG Platform over Live Streams & Cognitive Memory**
+> **PulseRAG — Autonomous Agentic RAG Platform over Live Streams & Cognitive Memory**
 > - Architected a production-grade Agentic RAG system using **Python (FastAPI, Google GenAI SDK)**, **LangGraph**, **ChromaDB**, and **SQLite** implementing Corrective RAG (CRAG) with autonomous document relevance grading.
 > - Engineered an event-driven **Live Stream Ingestion Engine** with a mathematical **recency-decay ranking algorithm**, enabling temporal retrieval where breaking news dynamically prioritizes over stale vector embeddings.
 > - Developed a **Dual-Tier Cognitive Memory System** (Episodic session buffer + Semantic Long-Term SQLite store with vector embeddings) providing personalized, entity-aware recall across sessions.

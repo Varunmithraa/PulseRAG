@@ -1,5 +1,5 @@
 """
-Single-command launcher for ChronosRAG Platform.
+Single-command launcher for PulseRAG Platform.
 Run with: python start.py
 """
 import os
@@ -14,7 +14,7 @@ sys.path.insert(0, str(BASE_DIR))
 
 if __name__ == "__main__":
     print("=" * 65)
-    print("⚡ Starting ChronosRAG: Autonomous Agentic RAG Platform")
+    print("⚡ Starting PulseRAG: Autonomous Agentic RAG Platform")
     print("=" * 65)
     print("• Live Stream Ingestion Engine: ACTIVE")
     print("• Temporal Recency-Decay Ranking: ENABLED")

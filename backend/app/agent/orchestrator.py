@@ -29,7 +29,7 @@ class AgentState(dict):
     citations: List[Dict[str, Any]]
     steps: List[Dict[str, Any]]
 
-class ChronosAgentOrchestrator:
+class PulseAgentOrchestrator:
     """Autonomous Cognitive Agent Orchestrator running LangGraph with Corrective RAG & Dual-Tier Memory."""
 
     def __init__(self):
@@ -454,4 +454,4 @@ Synthesize a grounded, insightful, and structured response citing sources where 
             "session_id": session_id
         }
 
-agent_orchestrator = ChronosAgentOrchestrator()
+agent_orchestrator = PulseAgentOrchestrator()

@@ -11,7 +11,7 @@ DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "ChronosRAG: Autonomous Agentic RAG Platform"
+    PROJECT_NAME: str = "PulseRAG: Autonomous Agentic RAG Platform"
     PROJECT_VERSION: str = "1.0.0"
     
     # Google Gemini Configuration
@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "text-embedding-004")
     
     # Storage Paths
-    SQLITE_PATH: Path = DATA_DIR / "chronos_memory.db"
+    SQLITE_PATH: Path = DATA_DIR / "pulserag_memory.db"
     CHROMA_PERSIST_DIR: Path = DATA_DIR / "chroma_db"
     
     # Real-Time Buffer Settings
