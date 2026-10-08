@@ -1,0 +1,26 @@
+[
+  {
+    "id": "kb_semi_roadmap_2026",
+    "title": "Global Semiconductor Architecture: High-NA EUV and CoWoS Packaging",
+    "content": "Advanced semiconductor manufacturing has transitioned to sub-2nm process nodes utilizing High-NA EUV lithography systems manufactured by ASML. Chipmaker packaging has become the primary bottleneck, with TSMC's CoWoS (Chip-on-Wafer-on-Substrate) and Intel's EMIB seeing unprecedented demand for AI accelerators like NVIDIA Blackwell and AMD Instinct. Thermal design power (TDP) for enterprise racks has reached 120kW per cabinet, necessitating liquid-to-chip cooling loops.",
+    "category": "Semiconductors",
+    "author": "Semiconductor Industry Research",
+    "date": "2026-01-15"
+  },
+  {
+    "id": "kb_datacenter_energy",
+    "title": "Hyperscale Datacenter Economics & Power Infrastructure",
+    "content": "Hyperscalers including Microsoft, Google, and Amazon are increasingly signing direct nuclear energy Power Purchase Agreements (PPAs) to support gigawatt-scale AI computing campuses. Capital expenditures (CapEx) for server infrastructure are projected to exceed $250 billion, with network interconnects (InfiniBand and 800G/1.6T Ethernet) comprising 18% of total hardware cluster costs.",
+    "category": "Infrastructure",
+    "author": "Cloud Infrastructure Quarterly",
+    "date": "2026-02-10"
+  },
+  {
+    "id": "kb_macro_liquidity",
+    "title": "Global Central Bank Liquidity & Sovereign Bond Dynamics",
+    "content": "Central bank balance sheet normalization (Quantitative Tightening) has created elevated volatility in long-dated sovereign debt markets. Financial equity valuations in the technology sector remain highly sensitive to real 10-year Treasury yields, with discount rate models implying a 15x to 28x forward price-to-earnings multiple depending on earnings growth acceleration in generative AI software.",
+    "category": "Macro Finance",
+    "author": "Global Macro Policy Group",
+    "date": "2026-02-28"
+  }
+]

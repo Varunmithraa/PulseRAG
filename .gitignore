@@ -1,0 +1,24 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Environment & Secrets
+.env
+
+# Database & Vector Storage
+data/chronos_memory.db
+data/chroma_db/
+data/*.db
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
