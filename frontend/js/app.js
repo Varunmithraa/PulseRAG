@@ -4,10 +4,64 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("send-btn");
   const tabBtns = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
+  const appContainer = document.getElementById("app-container");
+  const toggleSidebarBtn = document.getElementById("toggle-sidebar-btn");
+  const floatingSidebarBtn = document.getElementById("floating-sidebar-btn");
+
+  // Sidebar Toggle Logic
+  function setSidebarState(collapsed) {
+    if (!appContainer) return;
+    if (collapsed) {
+      appContainer.classList.add("sidebar-collapsed");
+      if (toggleSidebarBtn) {
+        toggleSidebarBtn.classList.add("collapsed");
+        toggleSidebarBtn.title = "Show Intelligence Sidebar (Ctrl+B)";
+      }
+    } else {
+      appContainer.classList.remove("sidebar-collapsed");
+      if (toggleSidebarBtn) {
+        toggleSidebarBtn.classList.remove("collapsed");
+        toggleSidebarBtn.title = "Hide Intelligence Sidebar (Ctrl+B)";
+      }
+    }
+    localStorage.setItem("pulserag_sidebar_collapsed", collapsed ? "true" : "false");
+  }
+
+  function toggleSidebar() {
+    const isCurrentlyCollapsed = appContainer.classList.contains("sidebar-collapsed");
+    setSidebarState(!isCurrentlyCollapsed);
+  }
+
+  // Restore saved state (default is open)
+  const savedState = localStorage.getItem("pulserag_sidebar_collapsed");
+  if (savedState === "true") {
+    setSidebarState(true);
+  } else {
+    setSidebarState(false);
+  }
+
+  if (toggleSidebarBtn) {
+    toggleSidebarBtn.addEventListener("click", toggleSidebar);
+  }
+  if (floatingSidebarBtn) {
+    floatingSidebarBtn.addEventListener("click", () => setSidebarState(false));
+  }
+
+  // Keyboard shortcut: Ctrl+B or Cmd+B
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  });
   
   // Tab Switching
   tabBtns.forEach(btn => {
     btn.addEventListener("click", () => {
+      // Auto-open sidebar if collapsed when clicking a tab
+      if (appContainer && appContainer.classList.contains("sidebar-collapsed")) {
+        setSidebarState(false);
+      }
       tabBtns.forEach(b => b.classList.remove("active"));
       tabContents.forEach(c => c.classList.remove("active"));
       btn.classList.add("active");

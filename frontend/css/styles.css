@@ -100,7 +100,7 @@ body {
 .header-status {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .status-pill {
@@ -113,6 +113,36 @@ body {
   padding: 6px 12px;
   border-radius: 20px;
   border: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.toggle-sidebar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: var(--accent-cyan);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.toggle-sidebar-btn:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  transform: translateY(-1px);
+}
+
+.toggle-sidebar-btn.collapsed {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-color);
+  color: var(--text-muted);
 }
 
 .pulse-dot {
@@ -130,21 +160,57 @@ body {
   100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-/* Layout */
+/* Layout - Robust Flexbox with Zero Overflow Squeezing */
 .app-container {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 440px;
+  display: flex;
   overflow: hidden;
+  position: relative;
+  width: 100%;
 }
 
 /* Chat Section */
 .chat-section {
+  flex: 1 1 0%;
+  min-width: 0; /* Critical: allows chat to shrink and never force sidebar offscreen */
   display: flex;
   flex-direction: column;
   height: 100%;
   border-right: 1px solid var(--border-color);
   position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Floating Reopen Button when Sidebar is Collapsed */
+.floating-sidebar-btn {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  background: rgba(18, 24, 38, 0.92);
+  border: 1px solid var(--border-glow);
+  color: var(--accent-cyan);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--glass-blur);
+  display: none;
+  align-items: center;
+  gap: 6px;
+  z-index: 25;
+  transition: all 0.2s;
+}
+
+.floating-sidebar-btn:hover {
+  background: rgba(26, 35, 56, 1);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.25);
+  transform: translateY(-1px);
+}
+
+.app-container.sidebar-collapsed .floating-sidebar-btn {
+  display: flex;
 }
 
 .chat-messages {
@@ -329,17 +395,38 @@ body {
 
 /* Sidebar / Right Panel */
 .sidebar-panel {
+  width: clamp(330px, 28vw, 420px);
+  min-width: 320px;
+  max-width: 440px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   background: var(--bg-secondary);
   backdrop-filter: var(--glass-blur);
   overflow: hidden;
+  border-left: 1px solid var(--border-color);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease,
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-container.sidebar-collapsed .sidebar-panel {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+  border-left: none;
+  transform: translateX(20px);
 }
 
 .panel-tabs {
   display: flex;
   border-bottom: 1px solid var(--border-color);
   background: rgba(10, 13, 20, 0.5);
+  flex-shrink: 0;
 }
 
 .tab-btn {
@@ -603,4 +690,33 @@ body {
 
 .modal-box input:focus, .modal-box textarea:focus {
   border-color: var(--accent-cyan);
+}
+
+/* Responsive Design & Viewport Adaptations */
+@media (max-width: 1100px) {
+  .sidebar-panel {
+    width: 340px;
+    min-width: 300px;
+  }
+  .toggle-btn-label {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .sidebar-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 340px;
+    max-width: 85vw;
+    z-index: 40;
+    box-shadow: -8px 0 35px rgba(0, 0, 0, 0.7);
+    background: rgba(14, 20, 32, 0.96);
+  }
+  .app-container:not(.sidebar-collapsed) .chat-section {
+    filter: brightness(0.65);
+    pointer-events: none;
+  }
 }

@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     
     # Google Gemini Configuration
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "gemini-2.5-flash")
+    DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "gemini-3.8-flash")
     EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "text-embedding-004")
     
     # Storage Paths

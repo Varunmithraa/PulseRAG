@@ -19,28 +19,31 @@ class CorrectiveRAGEvaluator:
         """
         # If Gemini client is active and configured
         if self.client and settings.GEMINI_API_KEY:
-            try:
-                prompt = f"""User Query: {query}
+            candidate_models = [settings.DEFAULT_MODEL, "gemini-3.7-flash", "gemini-flash-latest"]
+            for model_name in candidate_models:
+                try:
+                    prompt = f"""User Query: {query}
 Document Title: {doc_title}
 Document Content: {doc_content}
 
 Evaluate relevance according to the guidelines."""
-                
-                response = await self.client.aio.models.generate_content(
-                    model=settings.DEFAULT_MODEL,
-                    contents=prompt,
-                    config={
-                        "system_instruction": GRADER_SYSTEM_PROMPT,
-                        "response_mime_type": "application/json"
-                    }
-                )
-                data = json.loads(response.text)
-                score = float(data.get("relevance_score", 0.5))
-                is_rel = bool(data.get("is_relevant", score >= 0.5))
-                rationale = data.get("rationale", "Evaluated by Gemini CRAG grader.")
-                return score, is_rel, rationale
-            except Exception as e:
-                logger.warning("Gemini CRAG grader failed, using heuristic evaluation: %s", e)
+                    
+                    response = await self.client.aio.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config={
+                            "system_instruction": GRADER_SYSTEM_PROMPT,
+                            "response_mime_type": "application/json"
+                        }
+                    )
+                    data = json.loads(response.text)
+                    score = float(data.get("relevance_score", 0.5))
+                    is_rel = bool(data.get("is_relevant", score >= 0.5))
+                    rationale = data.get("rationale", f"Evaluated by {model_name} CRAG grader.")
+                    return score, is_rel, rationale
+                except Exception as e:
+                    logger.debug("CRAG grader model %s temporary issue (%s), trying fallback...", model_name, e)
+                    continue
 
         # Fallback Heuristic Grader
         query_terms = set(query.lower().split())

@@ -406,25 +406,30 @@ Synthesize a grounded, insightful, and structured response citing sources where 
 
         full_answer = ""
         if self.client and settings.GEMINI_API_KEY:
-            try:
-                # Streaming with Gemini
-                stream = self.client.models.generate_content_stream(
-                    model=settings.DEFAULT_MODEL,
-                    contents=full_prompt,
-                    config={
-                        "system_instruction": SYNTHESIS_SYSTEM_PROMPT,
-                        "temperature": 0.3
-                    }
-                )
-                for chunk in stream:
-                    if chunk.text:
-                        full_answer += chunk.text
-                        yield {"type": "token", "content": chunk.text}
-            except Exception as e:
-                logger.error("Gemini stream error: %s", e)
-                fallback = f"Note: Gemini streaming error ({e}). Generating fallback response.\n\n"
-                full_answer += fallback
-                yield {"type": "token", "content": fallback}
+            # Models to try in order of capability
+            candidate_models = [settings.DEFAULT_MODEL, "gemini-3.7-flash", "gemini-flash-latest"]
+            for model_name in candidate_models:
+                try:
+                    stream = self.client.models.generate_content_stream(
+                        model=model_name,
+                        contents=full_prompt,
+                        config={
+                            "system_instruction": SYNTHESIS_SYSTEM_PROMPT,
+                            "temperature": 0.3
+                        }
+                    )
+                    stream_succeeded = False
+                    for chunk in stream:
+                        if chunk.text:
+                            full_answer += chunk.text
+                            stream_succeeded = True
+                            yield {"type": "token", "content": chunk.text}
+                    if stream_succeeded:
+                        break
+                except Exception as e:
+                    logger.warning("Model %s failed (%s), trying fallback...", model_name, e)
+                    full_answer = ""
+                    continue
 
         if not full_answer:
             # Fallback local synthesis
