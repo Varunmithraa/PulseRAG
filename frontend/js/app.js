@@ -54,6 +54,34 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleSidebar();
     }
   });
+
+  // Light / Dark Theme Switcher Logic
+  const themeToggleBtn = document.getElementById("theme-toggle-btn");
+  const themeIcon = document.getElementById("theme-icon");
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    if (themeIcon) {
+      themeIcon.textContent = theme === "light" ? "☀️" : "🌙";
+    }
+    if (themeToggleBtn) {
+      themeToggleBtn.title = theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode";
+    }
+    localStorage.setItem("pulserag_theme", theme);
+  }
+
+  function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+    setTheme(currentTheme === "light" ? "dark" : "light");
+  }
+
+  // Restore saved theme (default is dark)
+  const savedTheme = localStorage.getItem("pulserag_theme") || "dark";
+  setTheme(savedTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", toggleTheme);
+  }
   
   // Tab Switching
   tabBtns.forEach(btn => {
