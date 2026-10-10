@@ -28,74 +28,12 @@ DEFAULT_RSS_FEEDS = [
     }
 ]
 
-# Realistic simulated breaking events for immediate demonstration & tests
-MOCK_EVENT_TEMPLATES = [
-    {
-        "title": "NVIDIA Finalizes Blackwell B200 Liquid-Cooling Server Architecture",
-        "content": "NVIDIA engineering teams alongside OEM partners have completed qualification of revised liquid-cooling distribution manifolds for the GB200 NVL72 rack systems. Volume shipments remain on track for hyperscaler datacenters.",
-        "source": "TechWire Live",
-        "category": "AI Hardware",
-        "tickers": ["NVDA", "TSM", "SMCI"]
-    },
-    {
-        "title": "TSMC Reports 3nm Wafer Yields Surpass 85% for Advanced Packaging",
-        "content": "Taiwan Semiconductor Manufacturing Co. (TSMC) announced significant throughput enhancements in its CoWoS-L advanced packaging capacity in Taichung, cutting lead times for flagship AI accelerators by 3 weeks.",
-        "source": "SemiAnalysis Radar",
-        "category": "Semiconductors",
-        "tickers": ["TSM", "ASML", "NVDA"]
-    },
-    {
-        "title": "Federal Reserve Open Market Committee Signals Data-Dependent Policy Rate Stance",
-        "content": "Federal Reserve Chair reiterated that future benchmark rate adjustments will hinge on upcoming core PCE and employment readings. Treasury yields held steady around 4.12% across the 10-year curve.",
-        "source": "MacroPulse Markets",
-        "category": "Macro Finance",
-        "tickers": ["SPY", "QQQ"]
-    },
-    {
-        "title": "OpenAI Releases Next-Gen Reasoning Model API with Native Tool Verification",
-        "content": "OpenAI has expanded enterprise availability of its latest multimodal reasoning model featuring built-in formal verification and deterministic JSON schemas, targeting regulated industries.",
-        "source": "AI Insider Daily",
-        "category": "AI / Tech",
-        "tickers": ["MSFT", "GOOGL"]
-    },
-    {
-        "title": "ASML Ships Next High-NA EUV Twinscan Scanner to Leading Foundry",
-        "content": "ASML confirmed successful delivery of its second commercial High-NA EUV lithography tool with 0.55 NA optics, laying ground for sub-2nm process nodes slated for 2026 volume production.",
-        "source": "Semiconductor World",
-        "category": "Semiconductors",
-        "tickers": ["ASML", "INTC", "TSM"]
-    },
-    {
-        "title": "AMD Expands ROCm 6.3 Open-Source AI Software Stack with vLLM Acceleration",
-        "content": "AMD announced deep integration of its ROCm 6.3 acceleration libraries with vLLM and TensorRT-LLM runtimes, narrowing the software gap with CUDA for Instinct MI300X enterprise clusters.",
-        "source": "HPC Wire",
-        "category": "AI Hardware",
-        "tickers": ["AMD", "NVDA"]
-    }
-]
-
 class LiveIngestionEngine:
-    """Orchestrates live RSS fetching, simulated event emissions, and broadcaster pipelines."""
+    """Orchestrates live RSS fetching and real-time broadcaster pipelines."""
 
     def __init__(self):
         self.is_running = False
         self.subscribers: List[asyncio.Queue] = []
-        self._seed_initial_events()
-
-    def _seed_initial_events(self):
-        """Populates the buffer with initial temporal events spanning the last 4 hours."""
-        now = time.time()
-        for i, item in enumerate(MOCK_EVENT_TEMPLATES):
-            # Spread timestamps from 10 minutes ago to 3.5 hours ago
-            simulated_ts = now - (i * 1800 + random.randint(120, 600))
-            live_stream_buffer.add_event(
-                title=item["title"],
-                content=item["content"],
-                source=item["source"],
-                category=item["category"],
-                tickers=item.get("tickers", []),
-                timestamp=simulated_ts
-            )
 
     def subscribe(self) -> asyncio.Queue:
         """Subscribes an SSE or WebSocket client queue to live incoming events."""
@@ -170,20 +108,6 @@ class LiveIngestionEngine:
                     for feed in DEFAULT_RSS_FEEDS:
                         await self.fetch_rss_feed(feed)
                         await asyncio.sleep(1)
-
-                # 2. Every 25 seconds, emit a simulated market event if buffer is active
-                if counter % 5 == 0 and random.random() > 0.4:
-                    template = random.choice(MOCK_EVENT_TEMPLATES)
-                    event = live_stream_buffer.add_event(
-                        title=f"[UPDATE] {template['title']}",
-                        content=template["content"],
-                        source="Live Market Ticker",
-                        category=template["category"],
-                        tickers=template.get("tickers", []),
-                        timestamp=time.time()
-                    )
-                    await self.broadcast_event(event)
-
                 counter += 1
                 await asyncio.sleep(5)
             except asyncio.CancelledError:
