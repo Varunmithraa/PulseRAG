@@ -37,6 +37,19 @@ class MemoryFactRequest(BaseModel):
     fact_content: str
     importance_score: Optional[float] = 0.85
 
+class LinkFeedRequest(BaseModel):
+    name: str
+    url: str
+    category: Optional[str] = "Live Web"
+    description: Optional[str] = ""
+
+class UnlinkFeedRequest(BaseModel):
+    name: str
+
+class ToggleFeedRequest(BaseModel):
+    name: str
+    enabled: bool
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 1. Start background ingestion worker
@@ -61,6 +74,7 @@ async def get_status():
     """Returns runtime telemetry for the agent dashboard."""
     recent_events = live_stream_buffer.get_recent(50)
     all_facts = db.list_all_facts(limit=50)
+    active_feeds_count = len([f for f in ingestion_engine.active_feeds.values() if f.get("enabled", True)])
     return {
         "project": settings.PROJECT_NAME,
         "version": settings.PROJECT_VERSION,
@@ -68,6 +82,7 @@ async def get_status():
         "model": settings.DEFAULT_MODEL,
         "live_buffer_count": len(recent_events),
         "memory_facts_count": len(all_facts),
+        "active_feeds_count": active_feeds_count,
         "decay_lambda": settings.TIME_DECAY_LAMBDA,
         "semantic_weight": settings.SEMANTIC_WEIGHT,
         "recency_weight": settings.RECENCY_WEIGHT
@@ -141,6 +156,36 @@ async def delete_memory(fact_id: int, user_id: str = "default_user", entity_key:
     """Deletes a learned fact."""
     success = memory_manager.semantic.delete_fact(fact_id=fact_id, user_id=user_id, entity_key=entity_key)
     return {"status": "deleted" if success else "not_found"}
+
+# --- Dynamic Feed & Source Hub Routes ---
+
+@app.get("/api/feeds")
+async def get_feeds():
+    """Returns active feeds and discoverable catalog with link statuses."""
+    return ingestion_engine.get_feeds_overview()
+
+@app.post("/api/feeds/link")
+async def link_feed(req: LinkFeedRequest):
+    """Dynamically links an RSS source and starts polling it."""
+    feed = ingestion_engine.link_feed(
+        name=req.name,
+        url=req.url,
+        category=req.category or "Live Web",
+        description=req.description or ""
+    )
+    return {"status": "success", "feed": feed}
+
+@app.post("/api/feeds/unlink")
+async def unlink_feed(req: UnlinkFeedRequest):
+    """Unlinks a feed."""
+    success = ingestion_engine.unlink_feed(req.name)
+    return {"status": "unlinked" if success else "not_found"}
+
+@app.post("/api/feeds/toggle")
+async def toggle_feed(req: ToggleFeedRequest):
+    """Enables or pauses a linked feed."""
+    success = ingestion_engine.toggle_feed(req.name, req.enabled)
+    return {"status": "toggled" if success else "not_found", "enabled": req.enabled}
 
 # Mount frontend static directory
 frontend_dir = BASE_DIR / "frontend"

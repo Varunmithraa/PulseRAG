@@ -113,6 +113,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (dot) dot.style.background = "var(--accent-amber)";
         if (text) text.textContent = `Local Fallback • Set GEMINI_API_KEY in .env`;
       }
+      const feedsBadge = document.getElementById("feeds-count-badge");
+      if (feedsBadge && data.active_feeds_count !== undefined) {
+        feedsBadge.textContent = `${data.active_feeds_count} Feeds`;
+      }
     } catch (e) {
       console.warn("Could not fetch status:", e);
     }
