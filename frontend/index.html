@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css?v=3.2">
 </head>
 <body>
 
@@ -95,7 +95,10 @@
     </section>
 
     <!-- Right Sidebar (Tabs: Graph, Radar, Memory, Feeds) -->
-    <aside class="sidebar-panel">
+    <aside class="sidebar-panel" id="sidebar-panel">
+      <!-- Draggable Resizer Handle -->
+      <div class="sidebar-resizer" id="sidebar-resizer" title="Drag left/right to resize panel width"></div>
+
       <div class="panel-tabs">
         <button class="tab-btn active" data-tab="tab-graph">
           <span>🧠</span> Graph
@@ -108,6 +111,9 @@
         </button>
         <button class="tab-btn" data-tab="tab-feeds">
           <span>🌐</span> Feeds
+        </button>
+        <button class="panel-expand-btn" id="panel-expand-btn" title="Toggle Expand / Full Width Panel">
+          <span id="panel-expand-icon">⤢</span>
         </button>
       </div>
 
@@ -146,25 +152,31 @@
       <!-- Tab 4: Feeds & Sources Hub -->
       <div class="tab-content" id="tab-feeds">
         <div class="radar-toolbar">
-          <span style="font-size: 0.8rem; color: var(--text-dim);">Dynamic Source Manager</span>
-          <button class="inject-btn" id="open-custom-feed-btn" style="background: rgba(56,189,248,0.15); color: var(--accent-cyan); border-color: rgba(56,189,248,0.3);">+ Custom RSS</button>
+          <div>
+            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-main);">Live Source Manager</span>
+            <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 1px;">Stream real-time web intelligence</div>
+          </div>
+          <button class="inject-btn" id="open-custom-feed-btn" style="background: rgba(56,189,248,0.15); color: var(--accent-cyan); border: 1px solid rgba(56,189,248,0.35);">+ Custom RSS</button>
         </div>
 
         <!-- Search Bar for Feeds -->
         <div class="feed-search-box">
-          <input type="text" id="feed-search-input" placeholder="Search feeds by name, category, or topic..." autocomplete="off">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="feed-search-input" placeholder="Search feeds by name, category, or topic..." autocomplete="off">
+          </div>
         </div>
 
         <!-- Section 1: Active Connected Feeds -->
         <div class="feeds-section-header">
-          <span>Connected Feeds (<span id="active-feeds-count">0</span>)</span>
+          <span>Active Connected Feeds (<span id="active-feeds-count">0</span>)</span>
         </div>
         <div id="active-feeds-container">
           <!-- Populated by feeds_viewer.js -->
         </div>
 
         <!-- Section 2: Discover & Link Catalog -->
-        <div class="feeds-section-header" style="margin-top: 16px;">
+        <div class="feeds-section-header" style="margin-top: 20px;">
           <span>Discover Sources Catalog</span>
         </div>
         <div id="catalog-feeds-container">
@@ -221,10 +233,10 @@
   </div>
 
   <!-- Scripts -->
-  <script src="/js/agent_graph.js"></script>
-  <script src="/js/live_radar.js"></script>
-  <script src="/js/memory_viewer.js"></script>
-  <script src="/js/feeds_viewer.js"></script>
-  <script src="/js/app.js"></script>
+  <script src="/js/agent_graph.js?v=3.2"></script>
+  <script src="/js/live_radar.js?v=3.2"></script>
+  <script src="/js/memory_viewer.js?v=3.2"></script>
+  <script src="/js/feeds_viewer.js?v=3.2"></script>
+  <script src="/js/app.js?v=3.2"></script>
 </body>
 </html>

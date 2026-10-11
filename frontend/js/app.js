@@ -47,6 +47,88 @@ document.addEventListener("DOMContentLoaded", () => {
     floatingSidebarBtn.addEventListener("click", () => setSidebarState(false));
   }
 
+  // Draggable Sidebar Resizer & Expand Toggle
+  const sidebarPanel = document.getElementById("sidebar-panel");
+  const sidebarResizer = document.getElementById("sidebar-resizer");
+  const panelExpandBtn = document.getElementById("panel-expand-btn");
+  const panelExpandIcon = document.getElementById("panel-expand-icon");
+
+  // Restore saved width
+  const savedWidth = localStorage.getItem("pulserag_sidebar_width");
+  if (savedWidth && sidebarPanel) {
+    sidebarPanel.style.setProperty("--sidebar-width", `${savedWidth}px`);
+    sidebarPanel.style.width = `${savedWidth}px`;
+    if (parseInt(savedWidth, 10) > 520) {
+      sidebarPanel.classList.add("is-expanded");
+      if (panelExpandIcon) panelExpandIcon.textContent = "⤡";
+    }
+  }
+
+  // Dragging to resize
+  if (sidebarResizer && sidebarPanel) {
+    let isDragging = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    sidebarResizer.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      sidebarResizer.classList.add("is-dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      startX = e.clientX;
+      startWidth = sidebarPanel.getBoundingClientRect().width;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const dx = startX - e.clientX;
+      const newWidth = Math.max(320, Math.min(window.innerWidth * 0.8, startWidth + dx));
+      sidebarPanel.style.setProperty("--sidebar-width", `${newWidth}px`);
+      sidebarPanel.style.width = `${newWidth}px`;
+      if (newWidth > 520) {
+        sidebarPanel.classList.add("is-expanded");
+        if (panelExpandIcon) panelExpandIcon.textContent = "⤡";
+      } else {
+        sidebarPanel.classList.remove("is-expanded");
+        if (panelExpandIcon) panelExpandIcon.textContent = "⤢";
+      }
+      localStorage.setItem("pulserag_sidebar_width", Math.round(newWidth));
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (isDragging) {
+        isDragging = false;
+        sidebarResizer.classList.remove("is-dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      }
+    });
+  }
+
+  // 1-Click Expand / Maximize Toggle
+  if (panelExpandBtn && sidebarPanel) {
+    panelExpandBtn.addEventListener("click", () => {
+      const currentWidth = sidebarPanel.getBoundingClientRect().width;
+      if (currentWidth < 520) {
+        // Expand to wide 640px
+        sidebarPanel.style.setProperty("--sidebar-width", "640px");
+        sidebarPanel.style.width = "640px";
+        sidebarPanel.classList.add("is-expanded");
+        if (panelExpandIcon) panelExpandIcon.textContent = "⤡";
+        panelExpandBtn.title = "Collapse to Standard Width";
+        localStorage.setItem("pulserag_sidebar_width", "640");
+      } else {
+        // Collapse back to standard 390px
+        sidebarPanel.style.setProperty("--sidebar-width", "390px");
+        sidebarPanel.style.width = "390px";
+        sidebarPanel.classList.remove("is-expanded");
+        if (panelExpandIcon) panelExpandIcon.textContent = "⤢";
+        panelExpandBtn.title = "Expand / Maximize Panel Width";
+        localStorage.setItem("pulserag_sidebar_width", "390");
+      }
+    });
+  }
+
   // Keyboard shortcut: Ctrl+B or Cmd+B
   document.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {

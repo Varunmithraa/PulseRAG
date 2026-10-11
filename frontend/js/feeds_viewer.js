@@ -85,14 +85,14 @@ class FeedsViewer {
           <div class="feed-card-header">
             <div class="feed-title-box">
               <span class="feed-status-dot" style="background: ${statusColor}; box-shadow: 0 0 8px ${statusColor};"></span>
-              <strong>${feed.name}</strong>
+              <strong style="font-size: 0.88rem; color: var(--text-main);">${feed.name}</strong>
             </div>
-            <span class="badge-tag" style="font-size: 0.65rem;">${feed.category}</span>
+            <span class="badge-tag" style="font-size: 0.65rem; text-transform: uppercase;">${feed.category}</span>
           </div>
           
           <div class="feed-meta-row">
             <span>Status: <strong style="color: ${statusColor};">${statusText}</strong></span>
-            <span>Items Received: <strong>${feed.item_count || 0}</strong></span>
+            <span>Items Received: <strong style="color: var(--text-main);">${feed.item_count || 0}</strong></span>
           </div>
 
           <div class="feed-actions-row">
@@ -112,7 +112,7 @@ class FeedsViewer {
     if (!this.catalogContainer) return;
     if (catalogItems.length === 0) {
       this.catalogContainer.innerHTML = `
-        <div style="color: var(--text-dim); font-size: 0.8rem; text-align: center; padding: 14px;">
+        <div style="color: var(--text-dim); font-size: 0.8rem; text-align: center; padding: 16px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px dashed var(--border-color);">
           No matching sources found in catalog.
         </div>`;
       return;
@@ -123,8 +123,8 @@ class FeedsViewer {
       return `
         <div class="feed-card catalog-card">
           <div class="feed-card-header">
-            <strong>${item.name}</strong>
-            <span class="badge-tag" style="font-size: 0.65rem;">${item.category}</span>
+            <strong style="font-size: 0.88rem; color: var(--text-main);">${item.name}</strong>
+            <span class="badge-tag" style="font-size: 0.65rem; text-transform: uppercase;">${item.category}</span>
           </div>
           <p class="feed-desc">${item.description}</p>
           <div class="feed-card-footer">
