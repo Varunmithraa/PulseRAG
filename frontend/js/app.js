@@ -199,6 +199,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (feedsBadge && data.active_feeds_count !== undefined) {
         feedsBadge.textContent = `${data.active_feeds_count} Feeds`;
       }
+      const alertsBadge = document.getElementById("alerts-count-badge");
+      if (alertsBadge && data.unread_alerts_count !== undefined) {
+        alertsBadge.textContent = `${data.unread_alerts_count} Alerts`;
+      }
     } catch (e) {
       console.warn("Could not fetch status:", e);
     }

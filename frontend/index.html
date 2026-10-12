@@ -33,6 +33,10 @@
       <div class="status-pill">
         <span id="feeds-count-badge">3 Feeds</span>
       </div>
+      <button class="status-pill alert-pill-btn" id="alerts-toggle-btn" title="Autonomous Breaking Intel Radar (Click to view alerts)">
+        <span class="alert-icon-pulse">🚨</span>
+        <span id="alerts-count-badge">0 Alerts</span>
+      </button>
       <button class="toggle-sidebar-btn" id="toggle-sidebar-btn" title="Toggle Intelligence Sidebar (Ctrl+B)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -232,11 +236,44 @@
     </div>
   </div>
 
+  <!-- Floating Autonomous Breaking Alert Banner / Toast -->
+  <div class="alert-toast-container" id="alert-toast-container"></div>
+
+  <!-- Modal: Autonomous Breaking Intel Radar -->
+  <div class="modal-overlay" id="alerts-modal">
+    <div class="modal-box alerts-modal-box">
+      <div class="alerts-modal-header">
+        <div class="alerts-header-title">
+          <div class="alert-modal-badge">🚨 PROACTIVE AGENT RADAR</div>
+          <h3 style="font-size: 1.15rem; color: var(--text-main); margin-top: 4px;">Autonomous Breaking Alerts</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+            Real-time high-impact catalysts detected autonomously from live streams and user watchlists.
+          </p>
+        </div>
+        <div class="alerts-header-actions">
+          <button class="action-btn-sm simulate-btn" id="simulate-alert-btn" title="Simulate a breaking catalyst to test agent">
+            ⚡ Simulate Catalyst
+          </button>
+          <button class="action-btn-sm clear-btn" id="clear-alerts-btn" title="Clear all alerts">
+            Clear All
+          </button>
+          <button class="close-modal-btn" id="close-alerts-modal-btn">✕</button>
+        </div>
+      </div>
+
+      <!-- Alerts List Container -->
+      <div class="alerts-list" id="alerts-list-container">
+        <!-- Populated dynamically by intel_alerts.js -->
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
-  <script src="/js/agent_graph.js?v=3.2"></script>
-  <script src="/js/live_radar.js?v=3.2"></script>
-  <script src="/js/memory_viewer.js?v=3.2"></script>
-  <script src="/js/feeds_viewer.js?v=3.2"></script>
-  <script src="/js/app.js?v=3.2"></script>
+  <script src="/js/agent_graph.js?v=3.3"></script>
+  <script src="/js/live_radar.js?v=3.3"></script>
+  <script src="/js/memory_viewer.js?v=3.3"></script>
+  <script src="/js/feeds_viewer.js?v=3.3"></script>
+  <script src="/js/intel_alerts.js?v=3.3"></script>
+  <script src="/js/app.js?v=3.3"></script>
 </body>
 </html>

@@ -40,6 +40,26 @@ class MemoryDatabase:
                 CREATE INDEX IF NOT EXISTS idx_user_facts_user 
                 ON user_facts(user_id);
             """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS autonomous_alerts (
+                    id TEXT PRIMARY KEY,
+                    event_id TEXT,
+                    headline TEXT NOT NULL,
+                    source TEXT,
+                    category TEXT,
+                    impact_score REAL,
+                    impact_level TEXT,
+                    autonomous_briefing TEXT,
+                    suggested_query TEXT,
+                    timestamp REAL,
+                    read INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_alerts_time 
+                ON autonomous_alerts(timestamp DESC);
+            """)
             conn.commit()
             logger.info("Initialized Memory SQLite database schema at %s", self.db_path)
 
@@ -93,5 +113,61 @@ class MemoryDatabase:
             """, (limit,))
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
+
+    # --- Autonomous Alert Persistence ---
+    def save_alert(self, alert: Dict[str, Any]) -> bool:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO autonomous_alerts 
+                (id, event_id, headline, source, category, impact_score, impact_level, autonomous_briefing, suggested_query, timestamp, read)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                alert["id"],
+                alert.get("event_id", ""),
+                alert["headline"],
+                alert.get("source", ""),
+                alert.get("category", ""),
+                alert.get("impact_score", 0.0),
+                alert.get("impact_level", "HIGH"),
+                alert.get("autonomous_briefing", ""),
+                alert.get("suggested_query", ""),
+                alert.get("timestamp", 0.0),
+                1 if alert.get("read") else 0
+            ))
+            conn.commit()
+            return True
+
+    def get_alerts(self, limit: int = 50) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT id, event_id, headline, source, category, impact_score, impact_level, autonomous_briefing, suggested_query, timestamp, read, created_at
+                FROM autonomous_alerts
+                ORDER BY timestamp DESC
+                LIMIT ?;
+            """, (limit,))
+            rows = cursor.fetchall()
+            alerts = []
+            for r in rows:
+                item = dict(r)
+                item["read"] = bool(item["read"])
+                alerts.append(item)
+            return alerts
+
+    def mark_alerts_read(self, alert_id: Optional[str] = None):
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if alert_id and alert_id != "all":
+                cursor.execute("UPDATE autonomous_alerts SET read = 1 WHERE id = ?", (alert_id,))
+            else:
+                cursor.execute("UPDATE autonomous_alerts SET read = 1")
+            conn.commit()
+
+    def clear_alerts(self):
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM autonomous_alerts")
+            conn.commit()
 
 db = MemoryDatabase()
