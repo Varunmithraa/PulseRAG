@@ -8,17 +8,22 @@ class IntelAlertsManager {
     this.closeBtn = document.getElementById("close-alerts-modal-btn");
     this.simulateBtn = document.getElementById("simulate-alert-btn");
     this.clearBtn = document.getElementById("clear-alerts-btn");
+    this.toggleMonitorBtn = document.getElementById("toggle-alerts-monitor-btn");
+    this.toggleSoundBtn = document.getElementById("toggle-alert-sound-btn");
 
     this.shownToastIds = new Set();
     this.alerts = [];
     this.unreadCount = 0;
     this.audioContext = null;
+    this.monitoringEnabled = true;
+    this.soundEnabled = localStorage.getItem("pulserag_alerts_sound") !== "false";
 
     this.init();
   }
 
   init() {
     this.bindEvents();
+    this.updateSoundButtonUI();
     this.fetchAlerts();
     // Poll alerts every 8 seconds
     setInterval(() => this.fetchAlerts(), 8000);
@@ -52,6 +57,62 @@ class IntelAlertsManager {
     if (this.clearBtn) {
       this.clearBtn.addEventListener("click", () => this.clearAlerts());
     }
+
+    if (this.toggleMonitorBtn) {
+      this.toggleMonitorBtn.addEventListener("click", () => this.toggleMonitoring());
+    }
+
+    if (this.toggleSoundBtn) {
+      this.toggleSoundBtn.addEventListener("click", () => this.toggleSound());
+    }
+  }
+
+  toggleSound() {
+    this.soundEnabled = !this.soundEnabled;
+    localStorage.setItem("pulserag_alerts_sound", this.soundEnabled ? "true" : "false");
+    this.updateSoundButtonUI();
+  }
+
+  updateSoundButtonUI() {
+    if (!this.toggleSoundBtn) return;
+    if (this.soundEnabled) {
+      this.toggleSoundBtn.textContent = "🔊 Sound On";
+      this.toggleSoundBtn.style.color = "var(--text-main)";
+    } else {
+      this.toggleSoundBtn.textContent = "🔇 Muted";
+      this.toggleSoundBtn.style.color = "var(--text-dim)";
+    }
+  }
+
+  async toggleMonitoring() {
+    try {
+      const newState = !this.monitoringEnabled;
+      const res = await fetch("/api/alerts/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: newState })
+      });
+      const data = await res.json();
+      this.monitoringEnabled = data.enabled !== false;
+      this.updateMonitoringButtonUI();
+    } catch (e) {
+      console.error("Failed to toggle alerts monitoring:", e);
+    }
+  }
+
+  updateMonitoringButtonUI() {
+    if (!this.toggleMonitorBtn) return;
+    if (this.monitoringEnabled) {
+      this.toggleMonitorBtn.textContent = "🟢 Active";
+      this.toggleMonitorBtn.style.borderColor = "var(--accent-emerald)";
+      this.toggleMonitorBtn.style.color = "var(--accent-emerald)";
+      this.toggleMonitorBtn.title = "Live Alerts Monitoring is Active (Click to Pause)";
+    } else {
+      this.toggleMonitorBtn.textContent = "⏸ Paused";
+      this.toggleMonitorBtn.style.borderColor = "var(--accent-amber)";
+      this.toggleMonitorBtn.style.color = "var(--accent-amber)";
+      this.toggleMonitorBtn.title = "Live Alerts Monitoring is Paused (Click to Resume)";
+    }
   }
 
   openModal() {
@@ -66,6 +127,7 @@ class IntelAlertsManager {
   }
 
   playAlertChime() {
+    if (!this.soundEnabled) return;
     try {
       if (!this.audioContext) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -103,6 +165,10 @@ class IntelAlertsManager {
       const data = await res.json();
       this.alerts = data.alerts || [];
       this.unreadCount = data.unread_count || 0;
+      if (data.monitoring_enabled !== undefined) {
+        this.monitoringEnabled = data.monitoring_enabled;
+        this.updateMonitoringButtonUI();
+      }
 
       this.updateHeaderBadge();
       this.renderAlertsList();

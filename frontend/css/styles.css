@@ -1277,6 +1277,26 @@ body {
   outline: none;
 }
 
+.toggle-monitoring-btn {
+  background: var(--pill-bg);
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+}
+
+.toggle-monitoring-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.mute-btn {
+  background: var(--pill-bg);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.mute-btn:hover {
+  border-color: var(--accent-cyan);
+}
+
 .simulate-btn {
   background: rgba(168, 85, 247, 0.15);
   color: var(--accent-purple);
@@ -1375,4 +1395,421 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-top: 4px;
+}
+
+/* --- Executive Voice Intelligence Briefing (Audio Player & Digest) --- */
+.briefing-pill-btn {
+  background: var(--pill-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.briefing-pill-btn:hover {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.35);
+  color: var(--accent-purple);
+}
+
+.briefing-pill-btn.is-playing {
+  border-color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.15);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
+}
+
+.briefing-mic-icon {
+  display: inline-block;
+  font-size: 0.95rem;
+}
+
+/* Modal Box */
+.briefing-modal-box {
+  width: 780px !important;
+  max-width: 94vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 26px;
+  gap: 16px;
+  border-radius: var(--radius-lg);
+  overflow-y: auto;
+}
+
+.briefing-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+
+.briefing-modal-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.briefing-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.refresh-briefing-btn {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.refresh-briefing-btn:hover {
+  background: rgba(56, 189, 248, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Player Deck */
+.briefing-player-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .briefing-player-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+
+.player-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.player-left-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-right-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.play-audio-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  color: #000;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35);
+}
+
+.play-audio-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+}
+
+.stop-audio-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--pill-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.stop-audio-btn:hover:not(:disabled) {
+  color: var(--accent-rose);
+  border-color: var(--accent-rose);
+}
+
+.stop-audio-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Equalizer Bars */
+.soundwave-equalizer {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+  padding: 0 6px;
+}
+
+.soundwave-equalizer .bar {
+  width: 3px;
+  height: 6px;
+  background: var(--accent-cyan);
+  border-radius: 2px;
+  transition: height 0.2s ease;
+}
+
+.soundwave-equalizer.is-playing .bar {
+  animation: bounceBar 0.9s infinite ease-in-out alternate;
+}
+
+.soundwave-equalizer.is-playing .bar-1 { animation-delay: 0.1s; }
+.soundwave-equalizer.is-playing .bar-2 { animation-delay: 0.35s; }
+.soundwave-equalizer.is-playing .bar-3 { animation-delay: 0.2s; }
+.soundwave-equalizer.is-playing .bar-4 { animation-delay: 0.5s; }
+.soundwave-equalizer.is-playing .bar-5 { animation-delay: 0.15s; }
+.soundwave-equalizer.is-playing .bar-6 { animation-delay: 0.4s; }
+
+@keyframes bounceBar {
+  0% { height: 4px; }
+  100% { height: 22px; }
+}
+
+.audio-time-label {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.voice-select-dropdown {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.74rem;
+  font-family: var(--font-sans);
+  outline: none;
+  cursor: pointer;
+}
+
+[data-theme="light"] .voice-select-dropdown {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.15);
+}
+
+.speed-toggle-group {
+  display: flex;
+  background: var(--pill-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.speed-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.speed-btn:hover {
+  color: var(--text-main);
+}
+
+.speed-btn.active {
+  background: var(--accent-cyan);
+  color: #000;
+}
+
+/* Progress track */
+.briefing-progress-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+[data-theme="light"] .briefing-progress-track {
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.briefing-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+  border-radius: 4px;
+  transition: width 0.15s linear;
+}
+
+/* Spoken Transcript */
+.briefing-transcript-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.transcript-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-main);
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+[data-theme="light"] .transcript-content {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+.transcript-sentence {
+  transition: all 0.25s ease;
+  border-radius: 3px;
+  padding: 1px 3px;
+}
+
+.transcript-sentence.active-sentence {
+  background: rgba(56, 189, 248, 0.25);
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+[data-theme="light"] .transcript-sentence.active-sentence {
+  background: rgba(2, 132, 199, 0.15);
+  color: #0284c7;
+}
+
+/* Key Pillars Row */
+.briefing-pillars-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.pillar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+[data-theme="light"] .pillar-card {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+.pillar-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.pillar-headline {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.pillar-source {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+/* Footer Row */
+.briefing-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.briefing-sources-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.briefing-source-tag {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: var(--pill-bg);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.briefing-followup-btn {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(56, 189, 248, 0.25));
+  color: var(--accent-purple);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.briefing-followup-btn:hover {
+  background: var(--accent-purple);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.3);
+}
+
+.briefing-loading-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  padding: 12px 0;
 }

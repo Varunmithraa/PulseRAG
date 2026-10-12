@@ -17,6 +17,7 @@ from .storage.database import db
 from .memory.memory_manager import memory_manager
 from .agent.orchestrator import agent_orchestrator
 from .agent.intel_alert_monitor import alert_monitor
+from .agent.briefing_generator import briefing_generator
 
 # Models
 class ChatRequest(BaseModel):
@@ -56,6 +57,9 @@ class SimulateAlertRequest(BaseModel):
 
 class MarkAlertReadRequest(BaseModel):
     alert_id: Optional[str] = "all"
+
+class ToggleAlertsRequest(BaseModel):
+    enabled: bool
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -223,6 +227,24 @@ async def clear_alerts():
     """Clears all stored alerts."""
     db.clear_alerts()
     return {"status": "cleared"}
+
+@app.post("/api/alerts/toggle")
+async def toggle_alerts(req: ToggleAlertsRequest):
+    """Enables or pauses autonomous live alert monitoring."""
+    state = alert_monitor.toggle_monitoring(req.enabled)
+    return {"status": "success", "enabled": state}
+
+# --- Executive Voice Intelligence Briefing Routes ---
+
+@app.get("/api/briefing/latest")
+async def get_latest_briefing():
+    """Returns the most recent executive voice briefing digest."""
+    return await briefing_generator.generate_briefing(force_refresh=False)
+
+@app.post("/api/briefing/generate")
+async def generate_briefing():
+    """Forces real-time synthesis of all live streams into a fresh voice briefing."""
+    return await briefing_generator.generate_briefing(force_refresh=True)
 
 # Mount frontend static directory
 frontend_dir = BASE_DIR / "frontend"

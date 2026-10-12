@@ -77,9 +77,16 @@ class AutonomousAlertMonitor:
     def __init__(self):
         self.processed_ids: set = set()
         self.is_running = False
+        self.is_enabled = True
         self.subscribers: List[asyncio.Queue] = []
         self._scenario_idx = 0
         self._init_genai()
+
+    def toggle_monitoring(self, enabled: bool) -> bool:
+        """Enables or pauses autonomous live alert evaluations."""
+        self.is_enabled = enabled
+        logger.info("Autonomous Alert Monitor state changed: enabled=%s", enabled)
+        return self.is_enabled
 
     def _init_genai(self):
         self.client = None
@@ -291,7 +298,8 @@ class AutonomousAlertMonitor:
             "alerts": alerts,
             "total_count": len(alerts),
             "unread_count": unread,
-            "critical_count": critical
+            "critical_count": critical,
+            "monitoring_enabled": self.is_enabled
         }
 
     async def start_worker(self):
@@ -300,6 +308,10 @@ class AutonomousAlertMonitor:
         logger.info("Autonomous Intel Alert Monitor worker started.")
         while self.is_running:
             try:
+                if not self.is_enabled:
+                    await asyncio.sleep(4)
+                    continue
+
                 # Inspect recent events in temporal buffer
                 recent_events = live_stream_buffer.get_recent(20)
                 for evt in reversed(recent_events):
