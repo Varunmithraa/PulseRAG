@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css?v=3.6">
+  <link rel="stylesheet" href="/css/styles.css?v=3.7">
 </head>
 <body>
 
@@ -87,14 +87,27 @@
       <!-- Quick Suggestion Pills -->
       <div class="suggestions-bar">
         <button class="suggestion-pill">What just broke regarding Blackwell chips and my tracked watchlist?</button>
-        <button class="suggestion-pill">Summarize recent semiconductor packaging bottlenecks</button>
+        <button class="suggestion-pill" data-mode="deep_research">🔬 Deep Research: Next-Gen AI Hardware & Packaging Bottlenecks</button>
         <button class="suggestion-pill">I also track AMD and quantum computing startups now</button>
-        <button class="suggestion-pill">What are the latest Federal Reserve macro comments?</button>
+        <button class="suggestion-pill" data-mode="deep_research">🔬 Deep Research: Global Macroeconomic Risks & Treasury Yields</button>
       </div>
 
       <!-- Input Bar -->
       <div class="chat-input-container">
-        <div class="input-box">
+        <!-- Mode Switcher: Quick Answer vs Deep Research -->
+        <div class="chat-mode-bar">
+          <div class="mode-segmented-control">
+            <button class="mode-toggle-btn active" id="mode-quick-btn" data-mode="quick" title="Fast single-hop response with CRAG">
+              <span>⚡</span> Quick Answer
+            </button>
+            <button class="mode-toggle-btn" id="mode-deep-btn" data-mode="deep_research" title="Autonomous Multi-Hop Intelligence Dossier">
+              <span>🔬</span> Deep Research
+            </button>
+          </div>
+          <span class="mode-hint-text" id="mode-hint-text">Standard CRAG routing & temporal recency search</span>
+        </div>
+
+        <div class="input-box" id="main-input-box">
           <input type="text" id="chat-input" placeholder="Ask a real-time question or update your tracked interests..." autocomplete="off">
           <button class="send-btn" id="send-btn" title="Send Query">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -453,6 +466,9 @@
           <button class="guide-prompt-pill" data-prompt="Summarize the latest AI and technology announcements from TechCrunch.">
             <span class="prompt-arrow">▶</span> "Summarize the latest AI and tech announcements from TechCrunch"
           </button>
+          <button class="guide-prompt-pill" data-mode="deep_research" data-prompt="Next-generation AI accelerators, packaging bottlenecks, and semiconductor supply chain risks">
+            <span class="prompt-arrow" style="color: #c084fc;">🔬</span> "[Deep Research] AI Accelerators & Semiconductor Supply Chains"
+          </button>
           <button class="guide-prompt-pill" data-prompt="What are the recent movements and market sentiment across cryptocurrency and digital assets?">
             <span class="prompt-arrow">▶</span> "What is happening in cryptocurrency and digital asset markets?"
           </button>
@@ -500,13 +516,13 @@
   </div>
 
   <!-- Scripts -->
-  <script src="/js/agent_graph.js?v=3.6"></script>
-  <script src="/js/live_radar.js?v=3.6"></script>
-  <script src="/js/memory_viewer.js?v=3.6"></script>
-  <script src="/js/feeds_viewer.js?v=3.6"></script>
-  <script src="/js/intel_alerts.js?v=3.6"></script>
-  <script src="/js/voice_briefing.js?v=3.6"></script>
-  <script src="/js/quick_guide.js?v=3.6"></script>
-  <script src="/js/app.js?v=3.6"></script>
+  <script src="/js/agent_graph.js?v=3.7"></script>
+  <script src="/js/live_radar.js?v=3.7"></script>
+  <script src="/js/memory_viewer.js?v=3.7"></script>
+  <script src="/js/feeds_viewer.js?v=3.7"></script>
+  <script src="/js/intel_alerts.js?v=3.7"></script>
+  <script src="/js/voice_briefing.js?v=3.7"></script>
+  <script src="/js/quick_guide.js?v=3.7"></script>
+  <script src="/js/app.js?v=3.7"></script>
 </body>
 </html>

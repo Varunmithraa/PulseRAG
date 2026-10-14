@@ -32,8 +32,9 @@ class QuickGuideManager {
     this.promptPills.forEach(pill => {
       pill.addEventListener("click", () => {
         const promptText = pill.getAttribute("data-prompt");
+        const mode = pill.getAttribute("data-mode") || "quick";
         if (promptText) {
-          this.runStarterPrompt(promptText);
+          this.runStarterPrompt(promptText, mode);
         }
       });
     });
@@ -79,12 +80,20 @@ class QuickGuideManager {
     }
   }
 
-  runStarterPrompt(promptText) {
+  runStarterPrompt(promptText, mode = "quick") {
     this.closeModal();
 
     const chatInput = document.getElementById("chat-input");
     const sendBtn = document.getElementById("send-btn");
     const appContainer = document.getElementById("app-container");
+    const modeDeepBtn = document.getElementById("mode-deep-btn");
+    const modeQuickBtn = document.getElementById("mode-quick-btn");
+
+    if (mode === "deep_research" && modeDeepBtn) {
+      modeDeepBtn.click();
+    } else if (modeQuickBtn) {
+      modeQuickBtn.click();
+    }
 
     // Auto-expand sidebar if collapsed
     if (appContainer && appContainer.classList.contains("sidebar-collapsed")) {

@@ -209,10 +209,43 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   checkStatus();
 
+  // Chat Mode Management: Quick Answer vs Deep Research
+  let currentChatMode = "quick";
+  const modeQuickBtn = document.getElementById("mode-quick-btn");
+  const modeDeepBtn = document.getElementById("mode-deep-btn");
+  const modeHintText = document.getElementById("mode-hint-text");
+  const mainInputBox = document.getElementById("main-input-box");
+
+  function setChatMode(mode) {
+    currentChatMode = mode;
+    if (mode === "deep_research") {
+      if (modeQuickBtn) modeQuickBtn.classList.remove("active");
+      if (modeDeepBtn) modeDeepBtn.classList.add("active");
+      if (modeHintText) modeHintText.textContent = "Autonomous 3-vector multi-hop decomposition + structured intelligence dossier";
+      if (mainInputBox) mainInputBox.classList.add("mode-deep-active");
+      if (chatInput) chatInput.placeholder = "Enter research topic or market question for deep multi-hop dossier...";
+    } else {
+      if (modeDeepBtn) modeDeepBtn.classList.remove("active");
+      if (modeQuickBtn) modeQuickBtn.classList.add("active");
+      if (modeHintText) modeHintText.textContent = "Standard CRAG routing & temporal recency search";
+      if (mainInputBox) mainInputBox.classList.remove("mode-deep-active");
+      if (chatInput) chatInput.placeholder = "Ask a real-time question or update your tracked interests...";
+    }
+  }
+
+  if (modeQuickBtn) modeQuickBtn.addEventListener("click", () => setChatMode("quick"));
+  if (modeDeepBtn) modeDeepBtn.addEventListener("click", () => setChatMode("deep_research"));
+
   // Suggestion Pills
   document.querySelectorAll(".suggestion-pill").forEach(pill => {
     pill.addEventListener("click", () => {
-      chatInput.value = pill.textContent.trim();
+      const mode = pill.getAttribute("data-mode");
+      if (mode === "deep_research") {
+        setChatMode("deep_research");
+        chatInput.value = pill.textContent.replace("🔬 Deep Research: ", "").trim();
+      } else {
+        chatInput.value = pill.textContent.trim();
+      }
       chatInput.focus();
     });
   });
@@ -222,11 +255,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = chatInput.value.trim();
     if (!query) return;
 
+    const requestMode = currentChatMode;
     chatInput.value = "";
     sendBtn.disabled = true;
 
-    // Append User Message
-    appendMessage("user", query);
+    // Append User Message with Mode Indicator
+    appendMessage("user", query, requestMode);
 
     // Reset Agent Graph and switch to graph tab
     if (window.agentGraph) window.agentGraph.reset();
@@ -234,8 +268,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (graphTabBtn) graphTabBtn.click();
 
     // Create Assistant Message Placeholder
-    const assistantBubble = appendMessage("assistant", "");
+    const assistantBubble = appendMessage("assistant", "", requestMode);
     let fullResponseText = "";
+    let researchPlanRendered = false;
 
     try {
       const response = await fetch("/api/chat/stream", {
@@ -244,7 +279,8 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({
           query: query,
           user_id: "default_user",
-          session_id: "session_01"
+          session_id: "session_01",
+          mode: requestMode
         })
       });
 
@@ -283,11 +319,75 @@ document.addEventListener("DOMContentLoaded", () => {
                 const metric = ev.summary ? `${ev.summary.passed_count} Verified` : (ev.count ? `${ev.count} Chunks` : "");
                 window.agentGraph.setNodeCompleted(ev.node, ev.status, metric);
               }
+            } else if (ev.type === "research_plan" && !researchPlanRendered) {
+              researchPlanRendered = true;
+              const planBox = document.createElement("div");
+              planBox.className = "research-plan-preview";
+              const vectorsHtml = (ev.plan.vectors || []).map(v => 
+                `<span class="plan-vector-pill" title="${v.focus}">🎯 ${v.name}</span>`
+              ).join(" ");
+              planBox.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <strong style="color: #c084fc; font-size: 0.78rem;">🔬 Autonomous Multi-Hop Plan</strong>
+                  <span style="font-size: 0.68rem; color: var(--text-dim);">${(ev.plan.vectors || []).length} Investigative Vectors</span>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.74rem; margin-bottom: 6px;">${ev.plan.executive_scope || ""}</div>
+                <div>${vectorsHtml}</div>
+              `;
+              assistantBubble.prepend(planBox);
             } else if (ev.type === "token") {
               fullResponseText += ev.content;
-              assistantBubble.innerHTML = formatMarkdown(fullResponseText);
+              const textContainer = assistantBubble.querySelector(".response-body-text") || assistantBubble;
+              textContainer.innerHTML = formatMarkdown(fullResponseText);
               chatMessages.scrollTop = chatMessages.scrollHeight;
             } else if (ev.type === "done") {
+              // If Deep Research, attach interactive Export & Copy toolbar
+              if (ev.mode === "deep_research") {
+                const dossierHeader = document.createElement("div");
+                dossierHeader.className = "dossier-banner";
+                dossierHeader.innerHTML = `
+                  <div class="dossier-badge">📑 Executive Deep Research Dossier</div>
+                  <div class="dossier-actions">
+                    <button class="dossier-action-btn" id="export-dossier-btn" title="Download formatted Markdown dossier">
+                      <span>📄</span> Export Dossier (.md)
+                    </button>
+                    <button class="dossier-action-btn" id="copy-dossier-btn" title="Copy report to clipboard">
+                      <span>📋</span> Copy Report
+                    </button>
+                  </div>
+                `;
+                assistantBubble.insertBefore(dossierHeader, assistantBubble.firstChild);
+
+                const exportBtn = dossierHeader.querySelector("#export-dossier-btn");
+                if (exportBtn) {
+                  exportBtn.onclick = () => {
+                    const blob = new Blob([fullResponseText], { type: "text/markdown;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    const safeTopic = (ev.dossier_title || "intelligence-dossier").toLowerCase().replace(/[^a-z0-9]/g, "-");
+                    a.href = url;
+                    a.download = `PulseRAG-Dossier-${safeTopic}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  };
+                }
+
+                const copyBtn = dossierHeader.querySelector("#copy-dossier-btn");
+                if (copyBtn) {
+                  copyBtn.onclick = async () => {
+                    try {
+                      await navigator.clipboard.writeText(fullResponseText);
+                      copyBtn.innerHTML = `<span>✓</span> Copied!`;
+                      setTimeout(() => { copyBtn.innerHTML = `<span>📋</span> Copy Report`; }, 2500);
+                    } catch (err) {
+                      alert("Could not copy: " + err);
+                    }
+                  };
+                }
+              }
+
               // Append citations
               if (ev.citations && ev.citations.length > 0) {
                 const citationsEl = document.createElement("div");
@@ -320,13 +420,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function appendMessage(role, text) {
+  function appendMessage(role, text, mode = "quick") {
     const wrapper = document.createElement("div");
     wrapper.className = `message-wrapper ${role}`;
     
     const bubble = document.createElement("div");
     bubble.className = "message-bubble";
-    bubble.innerHTML = formatMarkdown(text);
+
+    if (role === "user" && mode === "deep_research") {
+      bubble.innerHTML = `<span style="font-size: 0.68rem; font-weight: 700; color: #c084fc; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 4px; padding: 2px 6px; margin-right: 6px;">🔬 DEEP RESEARCH</span> ${text}`;
+    } else if (role === "assistant" && mode === "deep_research") {
+      const textContainer = document.createElement("div");
+      textContainer.className = "response-body-text";
+      textContainer.innerHTML = formatMarkdown(text);
+      bubble.appendChild(textContainer);
+    } else {
+      bubble.innerHTML = formatMarkdown(text);
+    }
     
     wrapper.appendChild(bubble);
     chatMessages.appendChild(wrapper);
@@ -337,13 +447,33 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatMarkdown(text) {
     if (!text) return "";
     let html = text
-      .replace(/### (.*?)\n/g, "<h3>$1</h3>")
-      .replace(/## (.*?)\n/g, "<h2>$1</h2>")
+      .replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.25rem; color: #c084fc; margin: 12px 0 6px 0;">$1</h1>')
+      .replace(/^## (.*?)$/gm, '<h2 style="font-size: 1.05rem; color: var(--text-main); margin: 14px 0 6px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">$1</h2>')
+      .replace(/^### (.*?)$/gm, '<h3 style="font-size: 0.92rem; color: var(--accent-cyan); margin: 10px 0 4px 0;">$1</h3>')
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>")
       .replace(/`([^`]+)`/g, "<code>$1</code>")
-      .replace(/\n\n/g, "<br><br>")
+      .replace(/^---$/gm, "<hr>")
       .replace(/\n- (.*?)/g, "<br>• $1");
+
+    // Markdown Table Parser
+    if (html.includes("|")) {
+      html = html.replace(/((?:\|[^\n]+\|\r?\n)+)/g, (match) => {
+        const rows = match.trim().split("\n");
+        if (rows.length < 2) return match;
+        let tableHtml = '<div style="overflow-x: auto; margin: 12px 0;"><table class="dossier-table" style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">';
+        rows.forEach((row, idx) => {
+          if (row.includes("---")) return; // skip markdown divider
+          const cells = row.split("|").filter((c, i, arr) => i > 0 && i < arr.length - 1);
+          const tag = idx === 0 ? "th" : "td";
+          tableHtml += "<tr>" + cells.map(c => `<${tag} style="border: 1px solid var(--border-color); padding: 6px 10px;">${c.trim()}</${tag}>`).join("") + "</tr>";
+        });
+        tableHtml += "</table></div>";
+        return tableHtml;
+      });
+    }
+
+    html = html.replace(/\n\n/g, "<br><br>");
     return html;
   }
 

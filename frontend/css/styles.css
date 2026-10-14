@@ -2083,3 +2083,175 @@ body {
   color: var(--text-main);
   white-space: nowrap;
 }
+
+/* Deep Research Mode UI Controls */
+.chat-mode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mode-segmented-control {
+  display: flex;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 4px;
+}
+
+.mode-toggle-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.mode-toggle-btn:hover {
+  color: var(--text-main);
+}
+
+.mode-toggle-btn.active[data-mode="quick"] {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.mode-toggle-btn.active[data-mode="deep_research"] {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(56, 189, 248, 0.2));
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+}
+
+.mode-hint-text {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* Deep Research Active Input State */
+.input-box.mode-deep-active {
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+}
+
+.input-box.mode-deep-active .send-btn {
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+}
+
+/* Executive Dossier Card in Assistant Message */
+.dossier-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(56, 189, 248, 0.1));
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+
+.dossier-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c084fc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dossier-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dossier-action-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.dossier-action-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.5);
+  color: #c084fc;
+  transform: translateY(-1px);
+}
+
+/* Research Plan Preview */
+.research-plan-preview {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 0.76rem;
+}
+
+.plan-vector-pill {
+  display: inline-block;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #c084fc;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  margin: 3px 4px 3px 0;
+}
+
+/* Enhanced Markdown styling for Dossier */
+.message-bubble table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 0.8rem;
+}
+
+.message-bubble th, .message-bubble td {
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.message-bubble th {
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.message-bubble tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.message-bubble hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 16px 0;
+}
+

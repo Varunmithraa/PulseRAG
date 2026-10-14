@@ -24,6 +24,7 @@ class ChatRequest(BaseModel):
     query: str
     user_id: Optional[str] = "default_user"
     session_id: Optional[str] = "default_session"
+    mode: Optional[str] = "quick"
 
 class InjectEventRequest(BaseModel):
     title: str
@@ -114,7 +115,8 @@ async def chat_stream(req: ChatRequest):
             async for event in agent_orchestrator.execute_stream(
                 query=req.query,
                 user_id=req.user_id or "default_user",
-                session_id=req.session_id or "default_session"
+                session_id=req.session_id or "default_session",
+                mode=req.mode or "quick"
             ):
                 yield f"data: {json.dumps(event)}\n\n"
         except Exception as e:
