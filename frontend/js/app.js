@@ -335,12 +335,40 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div>${vectorsHtml}</div>
               `;
               assistantBubble.prepend(planBox);
+            } else if (ev.type === "conflict_matrix") {
+              renderConflictMatrix(ev.data);
             } else if (ev.type === "token") {
               fullResponseText += ev.content;
               const textContainer = assistantBubble.querySelector(".response-body-text") || assistantBubble;
               textContainer.innerHTML = formatMarkdown(fullResponseText);
               chatMessages.scrollTop = chatMessages.scrollHeight;
             } else if (ev.type === "done") {
+              // If Conflict Matrix was generated, attach in-chat reconciliation indicator
+              if (ev.conflict_matrix && ev.conflict_matrix.entries && ev.conflict_matrix.entries.length > 0) {
+                renderConflictMatrix(ev.conflict_matrix);
+                const contraCount = (ev.conflict_matrix.entries || []).filter(e => e.status === "CONTRADICTION").length;
+                const consCount = (ev.conflict_matrix.entries || []).filter(e => e.status === "CONSENSUS").length;
+                
+                const conflictBanner = document.createElement("div");
+                conflictBanner.className = `chat-conflict-banner ${contraCount > 0 ? "is-contra" : "is-consensus"}`;
+                conflictBanner.innerHTML = `
+                  <div class="chat-conflict-title">
+                    <span>${contraCount > 0 ? "🔴" : "🟢"}</span>
+                    <span>${contraCount > 0 ? `${contraCount} Temporal Contradiction Reconciled` : `${consCount} Cross-Source Consensus Claims Verified`}</span>
+                  </div>
+                  <button class="open-matrix-tab-btn" title="Inspect full Old vs. New Truths matrix in side panel">
+                    ⚖️ View Truth Matrix ➔
+                  </button>
+                `;
+                const openBtn = conflictBanner.querySelector(".open-matrix-tab-btn");
+                if (openBtn) {
+                  openBtn.onclick = () => {
+                    const matrixTabBtn = document.querySelector('.tab-btn[data-tab="tab-matrix"]');
+                    if (matrixTabBtn) matrixTabBtn.click();
+                  };
+                }
+                assistantBubble.appendChild(conflictBanner);
+              }
               // If Deep Research, attach interactive Export & Copy toolbar
               if (ev.mode === "deep_research") {
                 const dossierHeader = document.createElement("div");
@@ -484,6 +512,145 @@ document.addEventListener("DOMContentLoaded", () => {
       handleSend();
     }
   });
+
+  // --- Temporal Fact-Conflict & Truth Matrix Manager ---
+  let activeMatrixData = null;
+  let activeMatrixFilter = "all";
+
+  function renderConflictMatrix(matrixData) {
+    if (!matrixData) return;
+    activeMatrixData = matrixData;
+
+    const scorePill = document.getElementById("matrix-score-pill");
+    const scoreVal = document.getElementById("matrix-score-value");
+    const summaryBox = document.getElementById("matrix-summary-box");
+    const listContainer = document.getElementById("matrix-list-container");
+    const cntAll = document.getElementById("filter-count-all");
+    const cntContra = document.getElementById("filter-count-contra");
+    const cntCons = document.getElementById("filter-count-cons");
+    const cntDev = document.getElementById("filter-count-dev");
+
+    const entries = matrixData.entries || [];
+    const contraCount = entries.filter(e => e.status === "CONTRADICTION").length;
+    const consCount = entries.filter(e => e.status === "CONSENSUS").length;
+    const devCount = entries.filter(e => e.status === "DEVELOPING").length;
+
+    if (cntAll) cntAll.textContent = entries.length;
+    if (cntContra) cntContra.textContent = contraCount;
+    if (cntCons) cntCons.textContent = consCount;
+    if (cntDev) cntDev.textContent = devCount;
+
+    if (scoreVal) {
+      const pct = Math.round((matrixData.consensus_score || 0.9) * 100);
+      scoreVal.textContent = matrixData.has_conflicts ? `⚠️ ${pct}% Consensus` : `✓ ${pct}% Consensus`;
+    }
+    if (scorePill) {
+      if (matrixData.has_conflicts) {
+        scorePill.classList.add("has-conflicts");
+      } else {
+        scorePill.classList.remove("has-conflicts");
+      }
+    }
+
+    if (summaryBox) {
+      summaryBox.innerHTML = `<strong>Truth Reconciliation Summary:</strong> ${matrixData.conflict_summary || "Cross-source claims verified."}`;
+    }
+
+    if (listContainer) {
+      if (entries.length === 0) {
+        listContainer.innerHTML = `
+          <div class="empty-matrix-state">
+            <div style="font-size: 1.6rem; margin-bottom: 6px;">⚖️</div>
+            <div style="color: var(--text-dim); font-size: 0.76rem;">No claims detected in this query context.</div>
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = "";
+      entries.forEach(item => {
+        const card = document.createElement("div");
+        const status = item.status || "CONSENSUS";
+        card.className = `matrix-card is-${status.toLowerCase()}`;
+        card.setAttribute("data-status", status);
+
+        if (activeMatrixFilter !== "all" && activeMatrixFilter !== status) {
+          card.style.display = "none";
+        }
+
+        if (status === "CONTRADICTION") {
+          card.innerHTML = `
+            <div class="matrix-card-header">
+              <span class="matrix-claim-title">🔴 ${item.claim}</span>
+              <span class="matrix-entity-badge">${item.entity || "Entity"}</span>
+            </div>
+            <div class="matrix-timeline-diff">
+              <div class="timeline-earlier-row">
+                <strong>Earlier Stance [${item.earlier_source || "Prior Report"}]:</strong> ${item.earlier_claim}
+              </div>
+              <div class="timeline-superseded-arrow">
+                <span>⬇️</span> <span>${item.temporal_delta || "Superseded by Breaking Update"}</span>
+              </div>
+              <div class="timeline-latest-row">
+                <strong>Latest Verified [${item.latest_source || "Current Wire"}]:</strong> ${item.latest_claim}
+              </div>
+            </div>
+            <div class="matrix-verdict-box">
+              <strong>Reconciliation Verdict:</strong> ${item.verdict} (Confidence: ${Math.round((item.confidence || 0.9) * 100)}%)
+            </div>
+          `;
+        } else if (status === "CONSENSUS") {
+          card.innerHTML = `
+            <div class="matrix-card-header">
+              <span class="matrix-claim-title">🟢 ${item.claim}</span>
+              <span class="matrix-entity-badge">${item.entity || "Entity"}</span>
+            </div>
+            <div style="font-size: 0.76rem; color: var(--text-main); line-height: 1.45;">
+              ${item.latest_claim}
+            </div>
+            <div class="matrix-verdict-box" style="border-left-color: var(--accent-emerald);">
+              <strong>Consensus Corroboration:</strong> ${item.verdict}
+            </div>
+          `;
+        } else {
+          // DEVELOPING
+          card.innerHTML = `
+            <div class="matrix-card-header">
+              <span class="matrix-claim-title">🟡 ${item.claim}</span>
+              <span class="matrix-entity-badge">${item.entity || "Entity"}</span>
+            </div>
+            <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45;">
+              ${item.latest_claim}
+            </div>
+            <div class="matrix-verdict-box" style="border-left-color: #eab308;">
+              <strong>Single-Source Status:</strong> ${item.verdict}
+            </div>
+          `;
+        }
+
+        listContainer.appendChild(card);
+      });
+    }
+  }
+
+  // Filter Buttons Handling
+  document.querySelectorAll(".matrix-filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".matrix-filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeMatrixFilter = btn.getAttribute("data-filter") || "all";
+
+      document.querySelectorAll(".matrix-card").forEach(card => {
+        const cardStatus = card.getAttribute("data-status");
+        if (activeMatrixFilter === "all" || activeMatrixFilter === cardStatus) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  });
+
 
   // Inject Modal Handling
   const injectModal = document.getElementById("inject-modal");

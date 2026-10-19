@@ -6,6 +6,7 @@ class AgentGraphVisualizer {
       { id: "route_query", icon: "🧭", title: "Autonomous Intent Router", desc: "Temporal intent routing & query refinement" },
       { id: "retrieve_docs", icon: "📡", title: "Stream & Vector Retrieval", desc: "Temporal Recency-Decay search over live buffer" },
       { id: "grade_docs", icon: "⚖️", title: "Corrective RAG (CRAG) Grader", desc: "Document relevance & hallucination filter" },
+      { id: "conflict_matrix", icon: "🔍", title: "Temporal Conflict & Truth Matrix", desc: "Cross-source discrepancy & revision reconciliation" },
       { id: "synthesize", icon: "⚡", title: "Grounded Answer Synthesis", desc: "Streaming generation with inline citations" }
     ];
     this.renderInitial();

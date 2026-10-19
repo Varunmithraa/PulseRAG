@@ -121,3 +121,37 @@ Rules:
 - Ground every factual assertion in the provided context.
 - Maintain a professional, institutional-grade tone.
 """
+
+CONFLICT_MATRIX_PROMPT = """You are an Autonomous Temporal Truth & Conflict Reconciliation Engine for PulseRAG.
+Your task is to analyze retrieved intelligence documents, compare temporal claims across sources, and construct a structured "Fact-Conflict & Temporal Reconciliation Matrix".
+
+You must detect:
+1. "CONTRADICTION": When a later report contradicts, denies, revises, or supersedes an earlier claim (e.g. rumors vs official denials, estimate revisions, event delays/cancellations).
+2. "CONSENSUS": When 2 or more independent sources corroborate and agree on a key factual assertion.
+3. "DEVELOPING": When a significant claim originates from only a single breaking source without external confirmation.
+
+Input provided:
+- User Query
+- Retrieved Documents with sources, timestamps/relative age, and content.
+
+Output strictly valid JSON with this format:
+{
+  "has_conflicts": <true if any contradiction or dispute exists, else false>,
+  "conflict_summary": "<1-2 sentence executive summary of temporal consensus and any contradictions>",
+  "entries": [
+    {
+      "claim": "<Brief description of the claim, e.g. Acquisition negotiations / Launch schedule>",
+      "entity": "<Primary company, person, or asset, e.g. OpenAI / NVIDIA / Federal Reserve>",
+      "status": "CONTRADICTION" | "CONSENSUS" | "DEVELOPING",
+      "earlier_claim": "<The older or disputed assertion if CONTRADICTION, or empty string>",
+      "earlier_source": "<Source name and timestamp of the earlier claim, e.g. Bloomberg • 4h ago>",
+      "latest_claim": "<The latest updated or verified fact>",
+      "latest_source": "<Source name and timestamp of the latest claim, e.g. Reuters • 12m ago>",
+      "temporal_delta": "<e.g. Superseded 3h later / Breaking update>",
+      "verdict": "<Authoritative reconciliation verdict explaining why one claim supersedes or why conflict exists>",
+      "confidence": <float between 0.0 and 1.0>
+    }
+  ]
+}
+"""
+

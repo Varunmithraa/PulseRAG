@@ -14,25 +14,36 @@ class VectorStoreManager:
         self.persist_dir = str(persist_dir or settings.CHROMA_PERSIST_DIR)
         os.makedirs(self.persist_dir, exist_ok=True)
         
-        # Initialize persistent Chroma client
-        self.client = chromadb.PersistentClient(path=self.persist_dir)
-        
-        # Default embedding function: Chroma's built-in all-MiniLM-L6-v2 ONNX function
-        self.embedding_fn = embedding_functions.DefaultEmbeddingFunction()
-        
-        # Initialize collections
-        self.kb_collection = self.client.get_or_create_collection(
-            name="historical_kb",
-            embedding_function=self.embedding_fn,
-            metadata={"hnsw:space": "cosine"}
-        )
-        
-        self.memory_collection = self.client.get_or_create_collection(
-            name="semantic_memory_vectors",
-            embedding_function=self.embedding_fn,
-            metadata={"hnsw:space": "cosine"}
-        )
-        logger.info("ChromaDB initialized at %s with collections: historical_kb, semantic_memory_vectors", self.persist_dir)
+        # Initialize Chroma client with fail-safe fallback
+        try:
+            self.client = chromadb.PersistentClient(path=self.persist_dir)
+            self.embedding_fn = embedding_functions.DefaultEmbeddingFunction()
+            self.kb_collection = self.client.get_or_create_collection(
+                name="historical_kb",
+                embedding_function=self.embedding_fn,
+                metadata={"hnsw:space": "cosine"}
+            )
+            self.memory_collection = self.client.get_or_create_collection(
+                name="semantic_memory_vectors",
+                embedding_function=self.embedding_fn,
+                metadata={"hnsw:space": "cosine"}
+            )
+            logger.info("ChromaDB initialized at %s with collections: historical_kb, semantic_memory_vectors", self.persist_dir)
+        except BaseException as e:
+            logger.warning("ChromaDB persistent load encountered panic/error (%s). Falling back to in-memory EphemeralClient.", e)
+            self.client = chromadb.EphemeralClient()
+            self.embedding_fn = embedding_functions.DefaultEmbeddingFunction()
+            self.kb_collection = self.client.get_or_create_collection(
+                name="historical_kb",
+                embedding_function=self.embedding_fn,
+                metadata={"hnsw:space": "cosine"}
+            )
+            self.memory_collection = self.client.get_or_create_collection(
+                name="semantic_memory_vectors",
+                embedding_function=self.embedding_fn,
+                metadata={"hnsw:space": "cosine"}
+            )
+
 
     def add_kb_documents(self, documents: List[str], metadatas: List[Dict[str, Any]], ids: List[str]):
         """Adds static knowledge base documents."""

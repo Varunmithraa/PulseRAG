@@ -12,15 +12,23 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 
+# Ensure UTF-8 output on Windows consoles
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 if __name__ == "__main__":
     print("=" * 65)
-    print("⚡ Starting PulseRAG: Autonomous Agentic RAG Platform")
+    print("[PulseRAG] Starting PulseRAG: Autonomous Agentic RAG Platform")
     print("=" * 65)
-    print("• Live Stream Ingestion Engine: ACTIVE")
-    print("• Temporal Recency-Decay Ranking: ENABLED")
-    print("• Dual-Tier Cognitive Memory (SQLite + Vector): INITIALIZED")
-    print("• LangGraph State Machine & CRAG Evaluator: READY")
-    print("• Local Web Dashboard: http://127.0.0.1:8000")
+    print("* Live Stream Ingestion Engine: ACTIVE")
+    print("* Temporal Recency-Decay Ranking: ENABLED")
+    print("* Dual-Tier Cognitive Memory (SQLite + Vector): INITIALIZED")
+    print("* LangGraph State Machine & CRAG Evaluator: READY")
+    print("* Local Web Dashboard: http://127.0.0.1:8000")
     print("=" * 65)
     
     # Open browser automatically after a short delay

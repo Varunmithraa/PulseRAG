@@ -2255,3 +2255,228 @@ body {
   margin: 16px 0;
 }
 
+/* Temporal Fact-Conflict & Truth Matrix Panel */
+.matrix-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.matrix-score-pill {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: var(--accent-emerald);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.matrix-score-pill.has-conflicts {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: var(--accent-rose);
+}
+
+.matrix-filter-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.matrix-filter-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.matrix-filter-btn:hover {
+  color: var(--text-main);
+  border-color: var(--accent-cyan);
+}
+
+.matrix-filter-btn.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: var(--accent-cyan);
+}
+
+.matrix-summary-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+.matrix-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 240px);
+  padding-right: 4px;
+}
+
+.empty-matrix-state {
+  text-align: center;
+  padding: 36px 16px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+/* Individual Matrix Reconciliation Cards */
+.matrix-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.matrix-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.matrix-card.is-contradiction {
+  border-left: 3px solid var(--accent-rose);
+  background: linear-gradient(to right, rgba(239, 68, 68, 0.05), var(--bg-card) 60%);
+}
+
+.matrix-card.is-consensus {
+  border-left: 3px solid var(--accent-emerald);
+  background: linear-gradient(to right, rgba(16, 185, 129, 0.05), var(--bg-card) 60%);
+}
+
+.matrix-card.is-developing {
+  border-left: 3px solid #eab308;
+  background: linear-gradient(to right, rgba(234, 179, 8, 0.05), var(--bg-card) 60%);
+}
+
+.matrix-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.matrix-claim-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.matrix-entity-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: var(--pill-bg);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: var(--text-muted);
+}
+
+/* Timeline Diff for Contradictions */
+.matrix-timeline-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.74rem;
+}
+
+.timeline-earlier-row {
+  color: var(--accent-rose);
+  opacity: 0.9;
+  text-decoration: line-through;
+}
+
+.timeline-superseded-arrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.timeline-latest-row {
+  color: var(--accent-emerald);
+  font-weight: 600;
+}
+
+.matrix-verdict-box {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid var(--accent-cyan);
+  padding: 4px 8px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* In-Chat Conflict Matrix Banner */
+.chat-conflict-banner {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(56, 189, 248, 0.08));
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chat-conflict-banner.is-consensus {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(56, 189, 248, 0.08));
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.chat-conflict-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.open-matrix-tab-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.open-matrix-tab-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+

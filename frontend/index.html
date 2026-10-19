@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css?v=3.7">
+  <link rel="stylesheet" href="/css/styles.css?v=3.8">
 </head>
 <body>
 
@@ -88,6 +88,7 @@
       <div class="suggestions-bar">
         <button class="suggestion-pill">What just broke regarding Blackwell chips and my tracked watchlist?</button>
         <button class="suggestion-pill" data-mode="deep_research">🔬 Deep Research: Next-Gen AI Hardware & Packaging Bottlenecks</button>
+        <button class="suggestion-pill">⚖️ Reconcile conflicting reports on AI startup acquisitions & market rumors</button>
         <button class="suggestion-pill">I also track AMD and quantum computing startups now</button>
         <button class="suggestion-pill" data-mode="deep_research">🔬 Deep Research: Global Macroeconomic Risks & Treasury Yields</button>
       </div>
@@ -128,6 +129,9 @@
         <button class="tab-btn active" data-tab="tab-graph">
           <span>🧠</span> Graph
         </button>
+        <button class="tab-btn" data-tab="tab-matrix">
+          <span>⚖️</span> Matrix
+        </button>
         <button class="tab-btn" data-tab="tab-radar">
           <span>📡</span> Radar
         </button>
@@ -152,7 +156,43 @@
         </div>
       </div>
 
-      <!-- Tab 2: Live Stream Radar -->
+      <!-- Tab 2: Temporal Fact-Conflict & Truth Matrix -->
+      <div class="tab-content" id="tab-matrix">
+        <div class="matrix-header-bar">
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+              <span>⚖️ Temporal Conflict & Truth Matrix</span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 2px;">
+              Old vs. New Truths • Reconciles breaking updates against stale claims
+            </div>
+          </div>
+          <div class="matrix-score-pill" id="matrix-score-pill">
+            <span id="matrix-score-value">100% Consensus</span>
+          </div>
+        </div>
+
+        <!-- Filter pills -->
+        <div class="matrix-filter-bar">
+          <button class="matrix-filter-btn active" data-filter="all">All (<span id="filter-count-all">0</span>)</button>
+          <button class="matrix-filter-btn" data-filter="CONTRADICTION">🔴 Contradictions (<span id="filter-count-contra">0</span>)</button>
+          <button class="matrix-filter-btn" data-filter="CONSENSUS">🟢 Consensus (<span id="filter-count-cons">0</span>)</button>
+          <button class="matrix-filter-btn" data-filter="DEVELOPING">🟡 Developing (<span id="filter-count-dev">0</span>)</button>
+        </div>
+
+        <div class="matrix-summary-box" id="matrix-summary-box">
+          Ready to verify temporal consistency. Submit any query to inspect real-time contradictions and corroborated consensus.
+        </div>
+
+        <div class="matrix-list-container" id="matrix-list-container">
+          <div class="empty-matrix-state">
+            <div style="font-size: 1.6rem; margin-bottom: 6px;">⚖️</div>
+            <div style="color: var(--text-dim); font-size: 0.76rem;">No claims evaluated yet.<br>Ask a temporal question or click a suggestion to run analysis.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Live Stream Radar -->
       <div class="tab-content" id="tab-radar">
         <div class="radar-toolbar">
           <span style="font-size: 0.8rem; color: var(--text-dim);">Sliding Temporal Ring-Buffer</span>
@@ -497,6 +537,10 @@
             <span>1-click live RSS feed manager with instant search</span>
           </div>
           <div class="legend-item">
+            <span class="legend-badge">⚖️ Matrix</span>
+            <span>Temporal conflict matrix reconciling breaking vs. stale claims</span>
+          </div>
+          <div class="legend-item">
             <span class="legend-badge">🚨 Alerts</span>
             <span>Autonomous background monitor with simulated catalyst testing</span>
           </div>
@@ -516,13 +560,13 @@
   </div>
 
   <!-- Scripts -->
-  <script src="/js/agent_graph.js?v=3.7"></script>
-  <script src="/js/live_radar.js?v=3.7"></script>
-  <script src="/js/memory_viewer.js?v=3.7"></script>
-  <script src="/js/feeds_viewer.js?v=3.7"></script>
-  <script src="/js/intel_alerts.js?v=3.7"></script>
-  <script src="/js/voice_briefing.js?v=3.7"></script>
-  <script src="/js/quick_guide.js?v=3.7"></script>
-  <script src="/js/app.js?v=3.7"></script>
+  <script src="/js/agent_graph.js?v=3.8"></script>
+  <script src="/js/live_radar.js?v=3.8"></script>
+  <script src="/js/memory_viewer.js?v=3.8"></script>
+  <script src="/js/feeds_viewer.js?v=3.8"></script>
+  <script src="/js/intel_alerts.js?v=3.8"></script>
+  <script src="/js/voice_briefing.js?v=3.8"></script>
+  <script src="/js/quick_guide.js?v=3.8"></script>
+  <script src="/js/app.js?v=3.8"></script>
 </body>
 </html>

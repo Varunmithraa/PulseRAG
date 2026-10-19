@@ -15,6 +15,7 @@ from .prompts import (
 )
 from .tools import tool_search_live_streams, tool_search_knowledge_base, tool_recall_user_memories
 from .evaluator import evaluator
+from .conflict_resolver import conflict_resolver
 from ..memory.memory_manager import memory_manager
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ class PulseAgentOrchestrator:
             try:
                 self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
                 evaluator.client = self.client
+                conflict_resolver.client = self.client
                 logger.info("Initialized Google GenAI client with key.")
             except Exception as e:
                 logger.warning("Could not initialize Google GenAI client: %s", e)
@@ -377,6 +379,26 @@ Synthesize a grounded, insightful, and structured response citing sources where 
                 "summary": summary
             }
 
+            # Step 4b: Temporal Contradiction & Fact-Conflict Matrix
+            yield {
+                "type": "step", 
+                "node": "conflict_matrix", 
+                "label": "Temporal Conflict & Truth Matrix", 
+                "status": "Cross-verifying temporal claims across sources..."
+            }
+            conflict_matrix = await conflict_resolver.analyze_conflicts(query=query, docs=initial_state['graded_docs'])
+            initial_state['conflict_matrix'] = conflict_matrix
+            yield {
+                "type": "step_done", 
+                "node": "conflict_matrix", 
+                "status": conflict_matrix.get("conflict_summary", "Reconciled temporal claims across sources."),
+                "conflict_matrix": conflict_matrix
+            }
+            yield {
+                "type": "conflict_matrix",
+                "data": conflict_matrix
+            }
+
         # Step 5: Grounded Synthesis
         yield {"type": "step", "node": "synthesize", "label": "Grounded Answer Synthesis", "status": "Synthesizing answer with citations..."}
         
@@ -466,7 +488,8 @@ Synthesize a grounded, insightful, and structured response citing sources where 
         yield {
             "type": "done",
             "citations": citations,
-            "session_id": session_id
+            "session_id": session_id,
+            "conflict_matrix": initial_state.get("conflict_matrix", {})
         }
 
     async def execute_deep_research_stream(self, query: str, user_id: str = "default_user",
@@ -633,6 +656,26 @@ Synthesize a grounded, insightful, and structured response citing sources where 
             "summary": summary
         }
 
+        # Step 4b: Temporal Contradiction & Fact-Conflict Matrix for Deep Research
+        yield {
+            "type": "step", 
+            "node": "conflict_matrix", 
+            "label": "Temporal Conflict & Truth Matrix", 
+            "status": "Cross-verifying claims across research vectors for temporal revisions..."
+        }
+        conflict_matrix = await conflict_resolver.analyze_conflicts(query=query, docs=graded_docs)
+        initial_state['conflict_matrix'] = conflict_matrix
+        yield {
+            "type": "step_done", 
+            "node": "conflict_matrix", 
+            "status": conflict_matrix.get("conflict_summary", "Reconciled multi-vector temporal claims."),
+            "conflict_matrix": conflict_matrix
+        }
+        yield {
+            "type": "conflict_matrix",
+            "data": conflict_matrix
+        }
+
         # Step 5: Executive Dossier Synthesis
         yield {
             "type": "step", 
@@ -766,7 +809,8 @@ Verified {len(citations)} source citations across the temporal ring buffer and v
             "dossier_title": plan.get("topic", query),
             "citations": citations,
             "session_id": session_id,
-            "plan": plan
+            "plan": plan,
+            "conflict_matrix": initial_state.get("conflict_matrix", {})
         }
 
 agent_orchestrator = PulseAgentOrchestrator()
