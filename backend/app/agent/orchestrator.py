@@ -16,6 +16,7 @@ from .prompts import (
 from .tools import tool_search_live_streams, tool_search_knowledge_base, tool_recall_user_memories
 from .evaluator import evaluator
 from .conflict_resolver import conflict_resolver
+from .bull_bear_analyst import bull_bear_analyst
 from ..memory.memory_manager import memory_manager
 
 logger = logging.getLogger(__name__)
@@ -49,6 +50,7 @@ class PulseAgentOrchestrator:
                 self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
                 evaluator.client = self.client
                 conflict_resolver.client = self.client
+                bull_bear_analyst.client = self.client
                 logger.info("Initialized Google GenAI client with key.")
             except Exception as e:
                 logger.warning("Could not initialize Google GenAI client: %s", e)
@@ -314,6 +316,10 @@ Synthesize a grounded, insightful, and structured response citing sources where 
         """
         if mode == "deep_research":
             async for ev in self.execute_deep_research_stream(query, user_id, session_id):
+                yield ev
+            return
+        if mode == "bull_bear":
+            async for ev in self.execute_bull_bear_stream(query, user_id, session_id):
                 yield ev
             return
         initial_state = {
@@ -810,6 +816,233 @@ Verified {len(citations)} source citations across the temporal ring buffer and v
             "citations": citations,
             "session_id": session_id,
             "plan": plan,
+            "conflict_matrix": initial_state.get("conflict_matrix", {})
+        }
+
+    async def execute_bull_bear_stream(self, query: str, user_id: str = "default_user",
+                                       session_id: str = "sess_01") -> AsyncGenerator[Dict[str, Any], None]:
+        """
+        Adversarial Intelligence Duel Stream:
+        1. Recalls active user watchlist & constraints from memory.
+        2. Decomposes inquiry into dual search vectors (Bullish momentum & catalysts vs Bearish risks & bottlenecks).
+        3. Executes dual-perspective sweep across streaming ring buffer & vector store.
+        4. CRAG relevance verification.
+        5. Temporal conflict matrix cross-check.
+        6. Conducts adversarial duel yielding calibrated Arbiter split and decisive swing factors.
+        7. Synthesizes an executive markdown duel report and streams token chunks.
+        """
+        initial_state = {
+            "user_id": user_id,
+            "session_id": session_id,
+            "query": query,
+            "recalled_memories": [],
+            "steps": []
+        }
+
+        # Step 1: Memory
+        yield {
+            "type": "step",
+            "node": "recall_memory",
+            "label": "Cognitive Memory Recall",
+            "status": "Scanning user preferences, risk tolerance & watchlist..."
+        }
+        mem_state = self._node_recall_memory(initial_state)
+        initial_state.update(mem_state)
+        yield {
+            "type": "step_done",
+            "node": "recall_memory",
+            "status": f"Recalled {len(initial_state['recalled_memories'])} user profile facts.",
+            "memories": initial_state['recalled_memories']
+        }
+
+        # Step 2: Adversarial Query Decomposition
+        yield {
+            "type": "step",
+            "node": "route_query",
+            "label": "Adversarial Query Decomposition",
+            "status": "Formulating opposing Bull & Bear research vectors..."
+        }
+        clean_topic = query.replace("⚖️", "").replace("Bull vs Bear:", "").replace("bull vs bear:", "").strip()
+        bull_query = f"{clean_topic} growth catalysts record surge demand breakthrough upside"
+        bear_query = f"{clean_topic} risks delays bottlenecks warning probe decline capex"
+
+        yield {
+            "type": "step_done",
+            "node": "route_query",
+            "status": f"Decomposed into Bull catalyst vector & Bear vulnerability vector.",
+            "bull_query": bull_query,
+            "bear_query": bear_query
+        }
+
+        # Step 3: Dual-Perspective Retrieval
+        yield {
+            "type": "step",
+            "node": "retrieve_docs",
+            "label": "Dual-Perspective Temporal Sweep",
+            "status": "Retrieving market signals across bullish & bearish vectors..."
+        }
+        bull_docs = tool_search_live_streams(bull_query, top_k=5)
+        bear_docs = tool_search_live_streams(bear_query, top_k=5)
+        kb_docs = tool_search_knowledge_base(clean_topic, top_k=4)
+
+        seen_titles = set()
+        combined_docs = []
+        for d in (bull_docs + bear_docs + kb_docs):
+            title = d.get("title", "")
+            if title and title not in seen_titles:
+                seen_titles.add(title)
+                combined_docs.append(d)
+
+        initial_state["retrieved_docs"] = combined_docs
+        yield {
+            "type": "step_done",
+            "node": "retrieve_docs",
+            "status": f"Retrieved {len(combined_docs)} candidate evidence chunks across both theses.",
+            "count": len(combined_docs)
+        }
+
+        # Step 4: CRAG Grading
+        yield {
+            "type": "step",
+            "node": "grade_docs",
+            "label": "Corrective RAG (CRAG) Grader",
+            "status": "Evaluating evidence authenticity and thesis alignment..."
+        }
+        graded_docs, summary = await evaluator.filter_documents(query=clean_topic, docs=combined_docs)
+        if not graded_docs:
+            graded_docs = combined_docs
+        initial_state["graded_docs"] = graded_docs
+        yield {
+            "type": "step_done",
+            "node": "grade_docs",
+            "status": f"CRAG Score: {int(summary['average_confidence'] * 100)}% ({len(graded_docs)} verified evidence chunks)",
+            "summary": summary
+        }
+
+        # Step 5: Fact-Conflict Matrix
+        yield {
+            "type": "step",
+            "node": "conflict_matrix",
+            "label": "Temporal Conflict & Truth Matrix",
+            "status": "Cross-verifying factual discrepancies between bull and bear evidence..."
+        }
+        conflict_matrix = await conflict_resolver.analyze_conflicts(query=clean_topic, docs=graded_docs)
+        initial_state["conflict_matrix"] = conflict_matrix
+        yield {
+            "type": "step_done",
+            "node": "conflict_matrix",
+            "status": conflict_matrix.get("conflict_summary", "Reconciled temporal claims across sources."),
+            "conflict_matrix": conflict_matrix
+        }
+        yield {
+            "type": "conflict_matrix",
+            "data": conflict_matrix
+        }
+
+        # Step 6: Adversarial Duel Engine
+        yield {
+            "type": "step",
+            "node": "bull_bear",
+            "label": "Adversarial Intelligence Duel",
+            "status": "Executing Bull vs Bear duel & computing calibrated Arbiter probability split..."
+        }
+        debate_data = await bull_bear_analyst.conduct_debate(
+            query=clean_topic,
+            docs=graded_docs,
+            memories=initial_state["recalled_memories"]
+        )
+        yield {
+            "type": "step_done",
+            "node": "bull_bear",
+            "status": f"Duel concluded: {debate_data['arbiter_verdict']['prevailing_side']} ({debate_data['arbiter_verdict']['bull_weight']}% Bull / {debate_data['arbiter_verdict']['bear_weight']}% Bear)",
+            "debate": debate_data
+        }
+        yield {
+            "type": "bull_bear_debate",
+            "data": debate_data
+        }
+
+        # Step 7: Stream Executive Duel Report
+        yield {
+            "type": "step",
+            "node": "synthesize",
+            "label": "Institutional Duel Synthesis",
+            "status": "Synthesizing executive duel briefing..."
+        }
+
+        # Citations
+        citations = []
+        for d in graded_docs[:6]:
+            source_type = d.get("source_type", "DOC")
+            if source_type == "LIVE_STREAM":
+                cite_label = f"Live Stream: {d.get('source')} • {d.get('age_str', 'recent')}"
+            else:
+                cite_label = f"Knowledge Base: {d.get('metadata', {}).get('title', 'Document')}"
+            citations.append({
+                "label": cite_label,
+                "title": d.get("title", ""),
+                "content": d.get("content", "")[:220] + "...",
+                "source": d.get("source", "KB"),
+                "url": d.get("url", "")
+            })
+
+        bull = debate_data.get("bull_case", {})
+        bear = debate_data.get("bear_case", {})
+        arbiter = debate_data.get("arbiter_verdict", {})
+
+        report_md = f"""# ⚖️ Institutional Adversarial Duel: {debate_data.get('topic', clean_topic)}
+
+### 🏛️ Calibrated Arbiter Verdict
+**Prevailing Trajectory:** `{arbiter.get('prevailing_side', 'NEUTRAL')}`  
+**Calibrated Probability Split:** 📈 **{arbiter.get('bull_weight', 50)}% Bullish** vs 📉 **{arbiter.get('bear_weight', 50)}% Bearish**
+
+> **🎯 Decisive 90-Day Swing Factor:**  
+> **{arbiter.get('decisive_swing_factor', 'Key operational delivery metrics and hyperscaler capex commitment.')}**
+
+{arbiter.get('executive_synthesis', '')}
+
+---
+
+## 📈 The Bull Case (Conviction: {bull.get('conviction_score', 75)}/100)
+**Thesis:** *{bull.get('core_thesis', '')}*
+
+**Key Upside Catalysts:**
+"""
+        for cat in bull.get("key_catalysts", []):
+            report_md += f"- **Catalyst:** {cat}\n"
+        report_md += f"\n**Upside Scenario:** {bull.get('upside_potential', '')}\n\n---\n\n"
+
+        report_md += f"""## 📉 The Bear Case (Conviction: {bear.get('conviction_score', 65)}/100)
+**Thesis:** *{bear.get('core_thesis', '')}*
+
+**Key Risk Factors & Bottlenecks:**
+"""
+        for r in bear.get("risk_factors", []):
+            report_md += f"- **Vulnerability:** {r}\n"
+        report_md += f"\n**Downside Failure Mode:** {bear.get('downside_vulnerability', '')}\n\n---\n\n"
+
+        report_md += f"""## ⚖️ Strategic Positioning Directive
+For institutional portfolio managers and technology strategists, current signals warrant **{arbiter.get('prevailing_side', 'BALANCED')}** posture. Monitor the decisive swing factor carefully before adjusting allocation thresholds.
+"""
+
+        for chunk in [report_md[i:i+120] for i in range(0, len(report_md), 120)]:
+            yield {"type": "token", "content": chunk}
+
+        # Learn from turn
+        memory_manager.learn_from_turn(
+            user_id=user_id,
+            session_id=session_id,
+            user_text=f"[Adversarial Duel] {query}",
+            assistant_response=report_md
+        )
+
+        yield {
+            "type": "done",
+            "mode": "bull_bear",
+            "topic": debate_data.get("topic", clean_topic),
+            "citations": citations,
+            "session_id": session_id,
+            "debate": debate_data,
             "conflict_matrix": initial_state.get("conflict_matrix", {})
         }
 

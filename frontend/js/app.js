@@ -209,32 +209,42 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   checkStatus();
 
-  // Chat Mode Management: Quick Answer vs Deep Research
+  // Chat Mode Management: Quick Answer vs Deep Research vs Bull vs Bear
   let currentChatMode = "quick";
   const modeQuickBtn = document.getElementById("mode-quick-btn");
   const modeDeepBtn = document.getElementById("mode-deep-btn");
+  const modeBullBearBtn = document.getElementById("mode-bull-bear-btn");
   const modeHintText = document.getElementById("mode-hint-text");
   const mainInputBox = document.getElementById("main-input-box");
 
   function setChatMode(mode) {
     currentChatMode = mode;
+    [modeQuickBtn, modeDeepBtn, modeBullBearBtn].forEach(b => { if (b) b.classList.remove("active"); });
+    if (mainInputBox) {
+      mainInputBox.classList.remove("mode-deep-active");
+      mainInputBox.classList.remove("mode-bull-bear-active");
+    }
+
     if (mode === "deep_research") {
-      if (modeQuickBtn) modeQuickBtn.classList.remove("active");
       if (modeDeepBtn) modeDeepBtn.classList.add("active");
       if (modeHintText) modeHintText.textContent = "Autonomous 3-vector multi-hop decomposition + structured intelligence dossier";
       if (mainInputBox) mainInputBox.classList.add("mode-deep-active");
       if (chatInput) chatInput.placeholder = "Enter research topic or market question for deep multi-hop dossier...";
+    } else if (mode === "bull_bear") {
+      if (modeBullBearBtn) modeBullBearBtn.classList.add("active");
+      if (modeHintText) modeHintText.textContent = "Adversarial Duel: Bull catalysts vs Bear risks + calibrated Arbiter probability split";
+      if (mainInputBox) mainInputBox.classList.add("mode-bull-bear-active");
+      if (chatInput) chatInput.placeholder = "Enter asset, market topic, or thesis for Bull vs Bear adversarial debate...";
     } else {
-      if (modeDeepBtn) modeDeepBtn.classList.remove("active");
       if (modeQuickBtn) modeQuickBtn.classList.add("active");
       if (modeHintText) modeHintText.textContent = "Standard CRAG routing & temporal recency search";
-      if (mainInputBox) mainInputBox.classList.remove("mode-deep-active");
       if (chatInput) chatInput.placeholder = "Ask a real-time question or update your tracked interests...";
     }
   }
 
   if (modeQuickBtn) modeQuickBtn.addEventListener("click", () => setChatMode("quick"));
   if (modeDeepBtn) modeDeepBtn.addEventListener("click", () => setChatMode("deep_research"));
+  if (modeBullBearBtn) modeBullBearBtn.addEventListener("click", () => setChatMode("bull_bear"));
 
   // Suggestion Pills
   document.querySelectorAll(".suggestion-pill").forEach(pill => {
@@ -243,6 +253,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (mode === "deep_research") {
         setChatMode("deep_research");
         chatInput.value = pill.textContent.replace("🔬 Deep Research: ", "").trim();
+      } else if (mode === "bull_bear") {
+        setChatMode("bull_bear");
+        chatInput.value = pill.textContent.replace("⚖️ Bull vs Bear: ", "").trim();
       } else {
         chatInput.value = pill.textContent.trim();
       }
@@ -335,6 +348,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div>${vectorsHtml}</div>
               `;
               assistantBubble.prepend(planBox);
+            } else if (ev.type === "bull_bear_debate") {
+              renderBullBearDuelCard(assistantBubble, ev.data);
             } else if (ev.type === "conflict_matrix") {
               renderConflictMatrix(ev.data);
             } else if (ev.type === "token") {
@@ -430,6 +445,49 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 assistantBubble.appendChild(citationsEl);
               }
+
+              // If Bull vs Bear debate, ensure duel card is rendered
+              if (ev.mode === "bull_bear" && ev.debate) {
+                renderBullBearDuelCard(assistantBubble, ev.debate);
+              }
+
+              // Message Action Toolbar (1-Click Bull vs Bear trigger & Copy)
+              const actionsBar = document.createElement("div");
+              actionsBar.style.cssText = "display: flex; gap: 8px; margin-top: 10px; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; flex-wrap: wrap;";
+              actionsBar.innerHTML = `
+                <button class="msg-action-btn bull-bear-btn" title="Run an Adversarial Bull vs Bear debate on this topic" style="padding: 4px 10px; font-size: 0.72rem; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>⚖️</span> Bull vs Bear Duel
+                </button>
+                <button class="msg-action-btn copy-btn" title="Copy response text" style="padding: 4px 10px; font-size: 0.72rem; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-dim); border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>📋</span> Copy
+                </button>
+              `;
+
+              const bbBtn = actionsBar.querySelector(".bull-bear-btn");
+              if (bbBtn) {
+                bbBtn.onclick = () => {
+                  setChatMode("bull_bear");
+                  chatInput.value = query;
+                  chatInput.focus();
+                  handleSend();
+                };
+              }
+
+              const cpBtn = actionsBar.querySelector(".copy-btn");
+              if (cpBtn) {
+                cpBtn.onclick = async () => {
+                  try {
+                    await navigator.clipboard.writeText(fullResponseText);
+                    cpBtn.innerHTML = `<span>✓</span> Copied!`;
+                    setTimeout(() => { cpBtn.innerHTML = `<span>📋</span> Copy`; }, 2000);
+                  } catch (e) {
+                    console.warn(e);
+                  }
+                };
+              }
+
+              assistantBubble.appendChild(actionsBar);
+
               // Refresh memory viewer in case facts were learned
               if (window.memoryViewer) window.memoryViewer.fetchMemories();
             } else if (ev.type === "error") {
@@ -457,7 +515,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (role === "user" && mode === "deep_research") {
       bubble.innerHTML = `<span style="font-size: 0.68rem; font-weight: 700; color: #c084fc; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 4px; padding: 2px 6px; margin-right: 6px;">🔬 DEEP RESEARCH</span> ${text}`;
-    } else if (role === "assistant" && mode === "deep_research") {
+    } else if (role === "user" && mode === "bull_bear") {
+      bubble.innerHTML = `<span style="font-size: 0.68rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; padding: 2px 6px; margin-right: 6px;">⚖️ BULL VS BEAR</span> ${text}`;
+    } else if (role === "assistant" && (mode === "deep_research" || mode === "bull_bear")) {
       const textContainer = document.createElement("div");
       textContainer.className = "response-body-text";
       textContainer.innerHTML = formatMarkdown(text);
@@ -470,6 +530,92 @@ document.addEventListener("DOMContentLoaded", () => {
     chatMessages.appendChild(wrapper);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return bubble;
+  }
+
+  // --- Adversarial Bull vs Bear Duel Card Renderer ---
+  function renderBullBearDuelCard(assistantBubble, data) {
+    if (!data || assistantBubble.querySelector(".bull-bear-card")) return;
+
+    const bull = data.bull_case || {};
+    const bear = data.bear_case || {};
+    const arbiter = data.arbiter_verdict || {};
+
+    const bullScore = bull.conviction_score || 75;
+    const bearScore = bear.conviction_score || 65;
+    const bullWeight = arbiter.bull_weight || 50;
+    const bearWeight = arbiter.bear_weight || 50;
+
+    let prevailingClass = "is-balanced";
+    const side = (arbiter.prevailing_side || "").toUpperCase();
+    if (side.includes("BULL")) prevailingClass = "is-bullish";
+    else if (side.includes("BEAR")) prevailingClass = "is-bearish";
+
+    const card = document.createElement("div");
+    card.className = "bull-bear-card";
+    card.innerHTML = `
+      <div class="arbiter-verdict-header">
+        <div class="arbiter-title-row">
+          <div class="arbiter-title">
+            <span>🏛️</span> Institutional Arbiter Verdict • ${data.topic || "Market Duel"}
+          </div>
+          <span class="arbiter-prevailing-badge ${prevailingClass}">
+            ${arbiter.prevailing_side || "BALANCED"}
+          </span>
+        </div>
+
+        <div class="arbiter-meter-wrapper">
+          <div class="arbiter-meter-labels">
+            <span class="arbiter-bull-label">📈 ${bullWeight}% BULLISH</span>
+            <span class="arbiter-bear-label">📉 ${bearWeight}% BEARISH</span>
+          </div>
+          <div class="arbiter-meter-track">
+            <div class="arbiter-meter-bull" style="width: ${bullWeight}%;"></div>
+            <div class="arbiter-meter-bear" style="width: ${bearWeight}%;"></div>
+          </div>
+        </div>
+
+        <div class="swing-factor-box">
+          <span class="swing-factor-title">🎯 Decisive 90-Day Swing Factor</span>
+          <span>${arbiter.decisive_swing_factor || "Key operational delivery metrics and customer capex commitments."}</span>
+        </div>
+      </div>
+
+      <div class="duel-grid">
+        <!-- The Bull Case -->
+        <div class="duel-col bull-col">
+          <div class="duel-col-header">
+            <span class="duel-col-title">📈 THE BULL CASE</span>
+            <span class="duel-conviction-badge">${bullScore}/100 Conviction</span>
+          </div>
+          <div class="duel-case-headline">${bull.title || "Secular Growth & Market Moat"}</div>
+          <div class="duel-thesis-box">${bull.core_thesis || ""}</div>
+          <ul class="duel-bullets-list">
+            ${(bull.key_catalysts || []).map(cat => `<li class="duel-bullet-item">${cat}</li>`).join("")}
+          </ul>
+          <div class="duel-scenario-box">
+            <strong>Upside:</strong> ${bull.upside_potential || "Accelerated earnings expansion over next 12-18 months."}
+          </div>
+        </div>
+
+        <!-- The Bear Case -->
+        <div class="duel-col bear-col">
+          <div class="duel-col-header">
+            <span class="duel-col-title">📉 THE BEAR CASE</span>
+            <span class="duel-conviction-badge">${bearScore}/100 Conviction</span>
+          </div>
+          <div class="duel-case-headline">${bear.title || "Supply Bottlenecks & Multiple Risk"}</div>
+          <div class="duel-thesis-box">${bear.core_thesis || ""}</div>
+          <ul class="duel-bullets-list">
+            ${(bear.risk_factors || []).map(risk => `<li class="duel-bullet-item">${risk}</li>`).join("")}
+          </ul>
+          <div class="duel-scenario-box">
+            <strong>Downside:</strong> ${bear.downside_vulnerability || "Multiple compression if delivery ramps decelerate."}
+          </div>
+        </div>
+      </div>
+    `;
+
+    assistantBubble.prepend(card);
   }
 
   function formatMarkdown(text) {

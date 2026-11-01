@@ -87,10 +87,13 @@ class QuickGuideManager {
     const sendBtn = document.getElementById("send-btn");
     const appContainer = document.getElementById("app-container");
     const modeDeepBtn = document.getElementById("mode-deep-btn");
+    const modeBullBearBtn = document.getElementById("mode-bull-bear-btn");
     const modeQuickBtn = document.getElementById("mode-quick-btn");
 
     if (mode === "deep_research" && modeDeepBtn) {
       modeDeepBtn.click();
+    } else if (mode === "bull_bear" && modeBullBearBtn) {
+      modeBullBearBtn.click();
     } else if (modeQuickBtn) {
       modeQuickBtn.click();
     }

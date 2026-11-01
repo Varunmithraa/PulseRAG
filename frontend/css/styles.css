@@ -2479,4 +2479,342 @@ body {
   color: var(--accent-cyan);
 }
 
+/* ==========================================================================
+   ADVERSARIAL BULL VS. BEAR INTELLIGENCE DUEL
+   ========================================================================== */
+
+.bull-bear-card {
+  margin: 14px 0;
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  animation: fadeInDuel 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-theme="light"] .bull-bear-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+@keyframes fadeInDuel {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Duel Arbiter Header */
+.arbiter-verdict-header {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.95));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+[data-theme="light"] .arbiter-verdict-header {
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(241, 245, 249, 0.95));
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.arbiter-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.arbiter-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arbiter-prevailing-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.arbiter-prevailing-badge.is-bullish {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.arbiter-prevailing-badge.is-bearish {
+  background: rgba(244, 63, 94, 0.2);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.4);
+}
+
+.arbiter-prevailing-badge.is-balanced {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+/* Two-Tone Probability Meter */
+.arbiter-meter-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.arbiter-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.arbiter-bull-label {
+  color: var(--accent-emerald);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arbiter-bear-label {
+  color: var(--accent-rose);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arbiter-meter-track {
+  height: 10px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.arbiter-meter-bull {
+  background: linear-gradient(90deg, #059669, #10b981);
+  height: 100%;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.arbiter-meter-bear {
+  background: linear-gradient(90deg, #f43f5e, #e11d48);
+  height: 100%;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Decisive Swing Factor Callout */
+.swing-factor-box {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid #f59e0b;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 8px 12px;
+  font-size: 0.74rem;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+[data-theme="light"] .swing-factor-box {
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.swing-factor-title {
+  font-weight: 700;
+  color: #f59e0b;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Duel Split Grid (Bull vs Bear) */
+.duel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 680px) {
+  .duel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.duel-col {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.duel-col.bull-col {
+  background: rgba(16, 185, 129, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .duel-col.bull-col {
+  background: rgba(16, 185, 129, 0.04);
+  border-right: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.duel-col.bear-col {
+  background: rgba(244, 63, 94, 0.03);
+}
+
+[data-theme="light"] .duel-col.bear-col {
+  background: rgba(244, 63, 94, 0.04);
+}
+
+.duel-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.duel-col-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bull-col .duel-col-title {
+  color: var(--accent-emerald);
+}
+
+.bear-col .duel-col-title {
+  color: var(--accent-rose);
+}
+
+.duel-conviction-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.bull-col .duel-conviction-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.bear-col .duel-conviction-badge {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.duel-case-headline {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.duel-thesis-box {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.4;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .duel-thesis-box {
+  background: rgba(241, 245, 249, 0.7);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.duel-bullets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.duel-bullet-item {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--text-main);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.duel-bullet-item::before {
+  content: "•";
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.bull-col .duel-bullet-item::before {
+  color: var(--accent-emerald);
+}
+
+.bear-col .duel-bullet-item::before {
+  color: var(--accent-rose);
+}
+
+.duel-scenario-box {
+  margin-top: auto;
+  font-size: 0.7rem;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.bull-col .duel-scenario-box {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px dashed rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.bear-col .duel-scenario-box {
+  background: rgba(244, 63, 94, 0.08);
+  border: 1px dashed rgba(244, 63, 94, 0.3);
+  color: #fb7185;
+}
+
+/* 1-Click Action Buttons on Messages */
+.msg-action-btn.bull-bear-btn {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  color: #c084fc;
+}
+
+.msg-action-btn.bull-bear-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: rgba(168, 85, 247, 0.5);
+  color: #e9d5ff;
+}
+
 

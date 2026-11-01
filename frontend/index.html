@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css?v=3.8">
+  <link rel="stylesheet" href="/css/styles.css?v=4.0">
 </head>
 <body>
 
@@ -87,6 +87,7 @@
       <!-- Quick Suggestion Pills -->
       <div class="suggestions-bar">
         <button class="suggestion-pill">What just broke regarding Blackwell chips and my tracked watchlist?</button>
+        <button class="suggestion-pill" data-mode="bull_bear">⚖️ Bull vs Bear: NVIDIA Blackwell Margins vs Packaging Bottlenecks</button>
         <button class="suggestion-pill" data-mode="deep_research">🔬 Deep Research: Next-Gen AI Hardware & Packaging Bottlenecks</button>
         <button class="suggestion-pill">⚖️ Reconcile conflicting reports on AI startup acquisitions & market rumors</button>
         <button class="suggestion-pill">I also track AMD and quantum computing startups now</button>
@@ -95,7 +96,7 @@
 
       <!-- Input Bar -->
       <div class="chat-input-container">
-        <!-- Mode Switcher: Quick Answer vs Deep Research -->
+        <!-- Mode Switcher: Quick Answer vs Deep Research vs Bull vs Bear -->
         <div class="chat-mode-bar">
           <div class="mode-segmented-control">
             <button class="mode-toggle-btn active" id="mode-quick-btn" data-mode="quick" title="Fast single-hop response with CRAG">
@@ -103,6 +104,9 @@
             </button>
             <button class="mode-toggle-btn" id="mode-deep-btn" data-mode="deep_research" title="Autonomous Multi-Hop Intelligence Dossier">
               <span>🔬</span> Deep Research
+            </button>
+            <button class="mode-toggle-btn" id="mode-bull-bear-btn" data-mode="bull_bear" title="Dual-Perspective Adversarial Duel with Calibrated Arbiter">
+              <span>⚖️</span> Bull vs Bear
             </button>
           </div>
           <span class="mode-hint-text" id="mode-hint-text">Standard CRAG routing & temporal recency search</span>
@@ -509,6 +513,9 @@
           <button class="guide-prompt-pill" data-mode="deep_research" data-prompt="Next-generation AI accelerators, packaging bottlenecks, and semiconductor supply chain risks">
             <span class="prompt-arrow" style="color: #c084fc;">🔬</span> "[Deep Research] AI Accelerators & Semiconductor Supply Chains"
           </button>
+          <button class="guide-prompt-pill" data-mode="bull_bear" data-prompt="NVIDIA Blackwell Margin Expansion vs Advanced CoWoS Packaging Bottlenecks">
+            <span class="prompt-arrow" style="color: #38bdf8;">⚖️</span> "[Bull vs Bear Duel] NVIDIA Blackwell Margins vs Packaging Risks"
+          </button>
           <button class="guide-prompt-pill" data-prompt="What are the recent movements and market sentiment across cryptocurrency and digital assets?">
             <span class="prompt-arrow">▶</span> "What is happening in cryptocurrency and digital asset markets?"
           </button>
@@ -523,6 +530,10 @@
           <div class="legend-item">
             <span class="legend-badge">🧠 Graph</span>
             <span>Real-time LangGraph node execution flow & CRAG grading</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-badge">⚖️ Duel</span>
+            <span>Adversarial Bull vs Bear dual-perspective engine with Arbiter split</span>
           </div>
           <div class="legend-item">
             <span class="legend-badge">📡 Radar</span>
@@ -560,13 +571,13 @@
   </div>
 
   <!-- Scripts -->
-  <script src="/js/agent_graph.js?v=3.8"></script>
-  <script src="/js/live_radar.js?v=3.8"></script>
-  <script src="/js/memory_viewer.js?v=3.8"></script>
-  <script src="/js/feeds_viewer.js?v=3.8"></script>
-  <script src="/js/intel_alerts.js?v=3.8"></script>
-  <script src="/js/voice_briefing.js?v=3.8"></script>
-  <script src="/js/quick_guide.js?v=3.8"></script>
-  <script src="/js/app.js?v=3.8"></script>
+  <script src="/js/agent_graph.js?v=4.0"></script>
+  <script src="/js/live_radar.js?v=4.0"></script>
+  <script src="/js/memory_viewer.js?v=4.0"></script>
+  <script src="/js/feeds_viewer.js?v=4.0"></script>
+  <script src="/js/intel_alerts.js?v=4.0"></script>
+  <script src="/js/voice_briefing.js?v=4.0"></script>
+  <script src="/js/quick_guide.js?v=4.0"></script>
+  <script src="/js/app.js?v=4.0"></script>
 </body>
 </html>

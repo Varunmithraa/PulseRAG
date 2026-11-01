@@ -18,6 +18,7 @@ from .memory.memory_manager import memory_manager
 from .agent.orchestrator import agent_orchestrator
 from .agent.intel_alert_monitor import alert_monitor
 from .agent.briefing_generator import briefing_generator
+from .agent.bull_bear_analyst import bull_bear_analyst
 
 # Models
 class ChatRequest(BaseModel):
@@ -25,6 +26,10 @@ class ChatRequest(BaseModel):
     user_id: Optional[str] = "default_user"
     session_id: Optional[str] = "default_session"
     mode: Optional[str] = "quick"
+
+class BullBearRequest(BaseModel):
+    query: str
+    user_id: Optional[str] = "default_user"
 
 class InjectEventRequest(BaseModel):
     title: str
@@ -247,6 +252,20 @@ async def get_latest_briefing():
 async def generate_briefing():
     """Forces real-time synthesis of all live streams into a fresh voice briefing."""
     return await briefing_generator.generate_briefing(force_refresh=True)
+
+# --- Adversarial Bull vs Bear Duel Routes ---
+
+@app.post("/api/analysis/bull-bear")
+async def generate_bull_bear(req: BullBearRequest):
+    """
+    Executes an adversarial Bull vs. Bear debate on the provided topic or asset
+    using retrieved live streaming intelligence and memory.
+    """
+    clean_topic = req.query.replace("⚖️", "").replace("Bull vs Bear:", "").replace("bull vs bear:", "").strip()
+    docs = live_stream_buffer.get_recent(15)
+    memories = db.get_facts_for_user(req.user_id or "default_user")
+    debate = await bull_bear_analyst.conduct_debate(query=clean_topic, docs=docs, memories=memories)
+    return {"status": "success", "debate": debate}
 
 # Mount frontend static directory
 frontend_dir = BASE_DIR / "frontend"
